@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MehodArchive
+namespace MethodArchiveSystem
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate)]
     public class ArchiveMethodAttribute : Attribute

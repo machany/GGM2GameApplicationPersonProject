@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MehodArchive
+namespace MethodArchiveSystem
 {
     public class MethodArchiveException : Exception
     {

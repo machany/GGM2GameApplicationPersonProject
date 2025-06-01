@@ -1,4 +1,4 @@
-﻿namespace MehodArchive
+﻿namespace MethodArchiveSystem
 {
     public interface IArchivedMethods
     {

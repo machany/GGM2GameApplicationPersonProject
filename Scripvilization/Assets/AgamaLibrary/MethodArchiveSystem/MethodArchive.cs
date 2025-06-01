@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace MehodArchive
+namespace MethodArchiveSystem
 {
     public class MethodArchive
     {
@@ -15,11 +15,11 @@ namespace MehodArchive
             archiveMethodDictionary = new Dictionary<string, Delegate>();
         }
 
-        public void Invoke(string name, params object[] parameters)
+        public void Invoke(string method, params object[] parameters)
         {
             try
             {
-                archiveMethodDictionary[name].DynamicInvoke(parameters);
+                archiveMethodDictionary[method].DynamicInvoke(parameters);
             }
             catch (KeyNotFoundException ex)
             {

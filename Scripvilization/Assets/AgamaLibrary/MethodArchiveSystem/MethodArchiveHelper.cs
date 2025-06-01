@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace MehodArchive
+namespace MethodArchiveSystem
 {
     public static class MethodArchiveHelper
     {
@@ -37,7 +37,7 @@ namespace MehodArchive
                 throw new InvalidOperationException($"Recceived method information is not static. method name : {methodInfo.Name}");
 
             ParameterInfo[] parameters = methodInfo.GetParameters();
-            IEnumerable<ParameterExpression> parameterExpressions = parameters.Select(parameter => Expression.Parameter(parameter.ParameterType));
+            ParameterExpression[] parameterExpressions = parameters.Select(parameter => Expression.Parameter(parameter.ParameterType, parameter.Name)).ToArray();
 
             MethodCallExpression methodCallExpression = Expression.Call(null, methodInfo, parameterExpressions);
             Type? funcType;
