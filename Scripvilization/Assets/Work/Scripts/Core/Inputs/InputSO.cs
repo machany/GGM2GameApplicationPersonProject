@@ -39,12 +39,39 @@ namespace Assets.Work.Scripts.Core.Inputs
         #region Player Input
 
         public Vector2 MoveDirection { get; private set; }
+        public float TurnValue { get; private set; }
+
+        public event Action<Vector2> OnMoveChangeEvent;
+        public event Action<Vector2> OnZoomDeltaValueChangeEvent;
+
+        public event Action<float> OnTurnChangeEvent;
+        public event Action OnResetKeyPressedEvent;
 
         public event Action<Vector2> OnMouseMoveEvent;
-        public event Action<bool> OnMouseSelectedEvent;
+        public event Action<bool> OnMouseSelectedStatusEvent;
 
-        public event Action<Vector2> OnMoveEvent;
-        public event Action<Vector2> OnZoomDeltaValueChangeEvent;
+        public void OnMove(InputAction.CallbackContext context)
+        {
+            MoveDirection = context.ReadValue<Vector2>();
+            OnMoveChangeEvent?.Invoke(MoveDirection);
+        }
+
+        public void OnZoom(InputAction.CallbackContext context)
+        {
+            OnZoomDeltaValueChangeEvent?.Invoke(context.ReadValue<Vector2>());
+        }
+
+        public void OnTurn(InputAction.CallbackContext context)
+        {
+            TurnValue = context.ReadValue<Vector2>().x;
+            OnTurnChangeEvent?.Invoke(TurnValue);
+        }
+
+        public void OnReset(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnResetKeyPressedEvent?.Invoke();
+        }
 
         public void OnMousePosition(InputAction.CallbackContext context)
         {
@@ -54,21 +81,10 @@ namespace Assets.Work.Scripts.Core.Inputs
         public void OnMouseSelect(InputAction.CallbackContext context)
         {
             if (context.performed)
-                OnMouseSelectedEvent.Invoke(true);
+                OnMouseSelectedStatusEvent?.Invoke(true);
 
             if (context.canceled)
-                OnMouseSelectedEvent.Invoke(false);
-        }
-
-        public void OnMove(InputAction.CallbackContext context)
-        {
-            MoveDirection = context.ReadValue<Vector2>();
-            OnMoveEvent?.Invoke(MoveDirection);
-        }
-
-        public void OnZoom(InputAction.CallbackContext context)
-        {
-            OnZoomDeltaValueChangeEvent?.Invoke(context.ReadValue<Vector2>());
+                OnMouseSelectedStatusEvent?.Invoke(false);
         }
 
         #endregion

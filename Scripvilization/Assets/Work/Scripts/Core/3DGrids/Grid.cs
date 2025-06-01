@@ -49,14 +49,16 @@ namespace Assets.Work.Scripts.Core._3DGrids
             return nodes[x, y, z];
         }
 
-        public Vector3 GetNodeToWorld(GridNode node)
-            => GetNodeToWorld(node.index.x, node.index.y, node.index.z);
-        public Vector3 GetNodeToWorld(Vector3Int position)
-            => GetNodeToWorld(position.x, position.y, position.z);
-        public Vector3 GetNodeToWorld(int x, int y, int z)
+        public Vector3 GetNodeToWorldPosition(GridNode node)
+            => GetNodeToWorldPosition(node.index.x, node.index.y, node.index.z);
+        public Vector3 GetNodeToWorldPosition(Vector3Int position)
+            => GetNodeToWorldPosition(position.x, position.y, position.z);
+        public Vector3 GetNodeToWorldPosition(int x, int y, int z)
             => GetNode(x, y, z).center;
 
-        public Vector3Int GetWorldToNodePoint(Vector3 worldPosition)
+        public GridNode GetWorldPositionToNode(Vector3 worldPosition)
+            => GetNode(GetWorldToNodePosition(worldPosition));
+        public Vector3Int GetWorldToNodePosition(Vector3 worldPosition)
         {
             Vector3 temp = worldPosition - _startPosition;
             temp.x /= _nodeSize.x;

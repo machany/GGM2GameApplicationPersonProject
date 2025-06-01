@@ -1,10 +1,4 @@
-﻿using AgamaLibrary.DataStructures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Work.Scripts.Sriptable
 {
@@ -13,9 +7,11 @@ namespace Assets.Work.Scripts.Sriptable
         public GameObject Object { get; }
         public string ObjectName { get; }
 
-        public NotifyValue<bool> CanExecuteCommandState { get; }
+        public bool Repeat { get; }
+        public string[] Commands { get; }
 
-        public void Execute();
-        public void Complete();
+        public void Execute(); // 명령어의 타겟이 됨
+        public void Abort(); // 실행 중인 현재 자신이 실행 중인 명령어 중단
+        public void Complete(); // 해당 명령어에서 자유로워짐
     }
 }

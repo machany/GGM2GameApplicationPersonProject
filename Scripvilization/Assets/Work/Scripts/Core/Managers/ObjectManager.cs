@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Assets.Work.Scripts.Core.Managers
 {
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(-25)]
     public class ObjectManager : MonoBehaviour
     {
         [SerializeField] protected EventChannelSO objectMangeEventChannel;
