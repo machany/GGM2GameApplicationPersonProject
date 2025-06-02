@@ -2,8 +2,11 @@
 
 namespace Assets.Work.Scripts.Executors
 {
-    public interface IExecutor : IArchivedMethods // 모든 아카이브 메서드들은 이 인터페이스를 상속받아 구현하게끔
+    public interface IExecutor : IArchivedMethods 
     {
-        // GameObject, params string[] parameters;
+        public bool Repeat { get; }
+        public string[] Commands { get; }
+
+        public void Abort(); // 실행 중인 현재 자신이 실행 중인 명령어 중단
     }
 }

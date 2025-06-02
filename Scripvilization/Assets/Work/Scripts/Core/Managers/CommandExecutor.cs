@@ -11,7 +11,8 @@ using UnityEngine;
 namespace Assets.Work.Scripts.Core.Managers
 {
     [DefaultExecutionOrder(-10)]
-    public class CommandExecutor : MonoBehaviour // 유효성 검사, 명령의 대상 받기, 명령어 실행
+    // 명령어의 메인 컨트롤러
+    public class CommandExecutor : MonoBehaviour // 유효성 검사, 명령의 대상 받기, 명령어 실행, 최소한의 파싱
     {
         [SerializeField] private ObjectFinder objectManagerFinder;
         [SerializeField] protected EventChannelSO commandExecuteChannel;
@@ -56,8 +57,11 @@ namespace Assets.Work.Scripts.Core.Managers
 
         public bool TryInvoke(string command, params string[] parameters)
         {
-            if (parameters == null || parameters.Length <= 0)
+            if (parameters == null)
                 return false;
+
+            if (parameters.Length <= 0)
+                TryInvoke("Commander", command);
 
             if (!_objetManager.TryGetObject(parameters[0], out IScriptable scriptable))
                 return false;
@@ -82,13 +86,16 @@ namespace Assets.Work.Scripts.Core.Managers
         {
             try
             {
-                _methodArchive.Invoke(command, parameters);
+                if (parameters == null || parameters.Length <= 0)
+                    _methodArchive.Invoke(command);
+                else
+                    _methodArchive.Invoke(command, parameters);
                 return true;
             }
             catch (MethodArchiveException ex)
             {
                 OnErrorEvent?.Invoke(errorOwner);
-                Debug.LogError($"{ex.message}\n{ex.exception.Message}");
+                Debug.LogError($"{errorOwner} : {ex.message}\n{ex.exception.Message}");
                 return false;
             }
         }

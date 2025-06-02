@@ -15,15 +15,19 @@ namespace Assets.Work.Scripts.Core.Events
 
     public class ChangeObjectEvent : GameEvent
     {
-        public bool isUpLoad;
-        public string name;
         public IScriptable scriptable;
+        public string newName;
+        public string beforeName;
 
-        public ChangeObjectEvent Initialize(bool isUpLoad, string name, IScriptable scriptable)
+        public bool remove;
+
+        public ChangeObjectEvent Initialize(bool remove, IScriptable scriptable, string newName, string beforeName = null)
         {
-            this.isUpLoad = isUpLoad;
-            this.name = name;
+            this.remove = remove;
+
             this.scriptable = scriptable;
+            this.newName = newName;
+            this.beforeName = beforeName;
 
             return this;
         }

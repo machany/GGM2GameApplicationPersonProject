@@ -1,88 +1,114 @@
-﻿using Assets.Work.Scripts.Core._3DGrids;
-using Assets.Work.Scripts.Core.Finders;
-using Assets.Work.Scripts.Core.Managers;
+﻿using AgamaLibrary.Unity.EventSystem;
+using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Scriptables;
-using Assets.Work.Scripts.Sriptable;
-using MethodArchiveSystem;
-using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Work.Scripts.Executors
 {
     public class EntityExecutor : MonoBehaviour, IExecutor
     {
-        [Serializable]
-        public class DirectionInfo
+        [Header("Default Setting")]
+        // IScriptable로 가져오고 싶은데 인터페이스는 직렬화 안 되니, EntityExcutor니까 ScriptableEntity에 의존 해도 괜찮을 듯.
+        [SerializeField] private ScriptableEntity scriptableOwner;
+        [SerializeField] private EventChannelSO commandExecuteChannel;
+        [SerializeField] private int commandExecuteInterval = 1000; // 명령어 작동 간격
+
+        [SerializeField] // 이거 테스트용입니다. 변수는 테스트용이 아녜요.
+        private bool _repeat; // 반복여부
+        public bool Repeat
         {
-            public string direction;
-            public Vector3Int directionValue;
+            get => _repeat;
+            set
+            {
+                _abort = false;
+
+                _repeat = value;
+                // 반복은 활성상태 상관없이 중단없음.
+            }
         }
 
-        [Header("Default Set")]
-        [SerializeField] private ObjectFinder gridManagerFinder;
+        private string[] _commands; // 명령어 목록
+        public string[] Commands
+        {
+            get => _commands;
+            set
+            {
+                _commands = value;
+                Abort(); // 명령어 변경시 즉시 중단.
+            }
+        }
 
-        [Header("Move")]
-        [SerializeField] private float moveDuration;
-        [SerializeField] private DirectionInfo[] directionInfoes;
-
-        private static GridManager _gridManager;
-
-        private static Dictionary<string, Vector3Int> _directionInfoDict;
-        private static float _moveDuration;
+        private bool _abort; // 중단 됨
+        private bool _executing; // 현재 명령어 사이클이 돌고 있는지 여부
 
         private void Awake()
         {
-            _gridManager = gridManagerFinder.GetObject<GridManager>();
-            _moveDuration = moveDuration;
-
-            InitializeDirectionDict();
+            Repeat = false;
+            _executing = false;
+            _abort = false;
         }
 
-        private void InitializeDirectionDict()
+        private void Update()
         {
-            _directionInfoDict = new Dictionary<string, Vector3Int>();
-
-            if (directionInfoes == null || directionInfoes.Length <= 0)
-                return;
-
-            foreach (DirectionInfo directionInfo in directionInfoes)
+            if (Repeat && !_executing)
             {
-                _directionInfoDict.Add(directionInfo.direction, directionInfo.directionValue);
-            }
-        }
-
-        [ArchiveMethod("이동")]
-        public static void Move(IScriptable target, string direction)
-        {
-            Vector3Int nodePosition = _gridManager.Grid.GetWorldToNodePosition(target.Object.transform.position);
-
-            if (_directionInfoDict.TryGetValue(direction, out Vector3Int dir))
-            {
-                nodePosition += dir;
-                GridNode node = _gridManager.Grid.GetNode(nodePosition);
-
-                if (node == null)
-                    return;
-
-                target.Execute();
-                if (target is ScriptableEntity entity)
+                // 명령 실행 전 중지
+                if (_abort)
                 {
-                    try
-                    {
-                        entity.GetCompo<ScriptableEntityMover>().MoveTo(node.center, _moveDuration);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogException(ex);
-                    }
+                    Repeat = false;
+                    _abort = false;
                 }
                 else
-                {
-                    target.Object.transform.position = node.center;
-                    target.Complete();
-                }
+                    ExecuteCommands();
             }
         }
+
+        private async void ExecuteCommands()
+        {
+            if (_executing || Commands == null)
+                return;
+
+            _abort = false;
+            _executing = true;
+
+            for (int i = 0; i < Commands.Length; i++)
+            {
+                commandExecuteChannel.InvokeEvent(CommandExecueteManageEvents.ExecuteCommandEvent.Initialize(Commands[i], scriptableOwner));
+                await Task.Delay(commandExecuteInterval);
+            }
+
+            _executing = false;
+        }
+
+        public void Abort()
+        {
+            _abort = true;
+        }
+
+#if UNITY_EDITOR
+
+        [Header("Test")]
+        [SerializeField] private string[] commandsTest;
+
+        [ContextMenu("Apply Comannd")]
+        private void ApplyCommandTest()
+        {
+            Commands = commandsTest;
+        }
+
+        [ContextMenu("Excute Comannd")]
+        private void ExecuteCommandTest()
+        {
+            ExecuteCommands();
+        }
+
+        [ContextMenu("Abort")]
+        private void AbortTest()
+        {
+            Abort();
+        }
+
+#endif
     }
 }

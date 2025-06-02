@@ -26,11 +26,15 @@ namespace Assets.Work.Scripts.Core.Managers
 
         private void HandleChangeObjectEvent(ChangeObjectEvent @event)
         {
-            if (@event.isUpLoad)
-                TryAddObject(@event.name, @event.scriptable);
+            if (@event.remove)
+                TryRemoveObject(@event.newName);
             else
-                TryRemoveObject(@event.name);
-            Debug.Log(@event.name);
+            {
+                // 기존 객체 삭제 후 새로 등록
+                TryRemoveObject(@event.beforeName);
+                TryAddObject(@event.newName, @event.scriptable);
+            }
+            Debug.Log(@event.newName);
         }
 
         public bool TryAddObject(string name, IScriptable obj)
@@ -40,6 +44,9 @@ namespace Assets.Work.Scripts.Core.Managers
 
         public bool TryRemoveObject(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return false;
+
             bool success = _objectDict.ContainsKey(name);
 
             if (success)
