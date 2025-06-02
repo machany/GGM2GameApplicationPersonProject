@@ -1,6 +1,5 @@
 ﻿using Assets.Work.Scripts.Core.Inputs;
 using DG.Tweening;
-using System;
 using Unity.Cinemachine;
 using UnityEngine;
 
@@ -10,20 +9,23 @@ namespace Assets.Work.Scripts.Core.Objects
     {
         [Header("Default Setting")]
         [SerializeField] private InputSO inputSO;
-        [SerializeField] private CinemachineFollow followCam;
+        [SerializeField] private CinemachineCamera cinemachineCam;
         [SerializeField] private float changeToOriginDuration;
 
         [Header("Move Setting")]
         [SerializeField] private float movementSpeed;
         [SerializeField] private Vector2 startPosition;
         [SerializeField] private Vector2 movementBounds;
+        [SerializeField] private bool moveSpeedApplyZoom;
 
         [Header("Zoom Setting")]
         [SerializeField] private float minZoomValue;
         [SerializeField] private float maxZoomValue;
         [SerializeField] private float zoomSpeed;
+        [SerializeField] private float zoomCameraOffset;
 
         [Header("Turn Setting")]
+        [SerializeField] private Transform cinemachineCamParant;
         [SerializeField] private float minTurnValue;
         [SerializeField] private float maxTurnValue;
         [SerializeField] private float turnSpeed;
@@ -35,16 +37,19 @@ namespace Assets.Work.Scripts.Core.Objects
         private float _originCameraZoom;
         private bool _changeToOrigin;
 
+        private float _lastResetTime;
+
         private void Awake()
         {
             inputSO.OnZoomDeltaValueChangeEvent += HandleZoomDeltaValueChangeEvent;
             inputSO.OnResetKeyPressedEvent += HandleResetKeyPressedEvent;
 
             _movementBoundValue = startPosition + movementBounds / 2;
-            _followCamRotationValue = followCam.transform.eulerAngles;
+            _followCamRotationValue = cinemachineCamParant.transform.eulerAngles;
 
-            _originCameraRotation = followCam.transform.eulerAngles;
-            _originCameraZoom = followCam.FollowOffset.y;
+            _originCameraRotation = _followCamRotationValue;
+            _originCameraZoom = cinemachineCam.Lens.OrthographicSize;
+
             _changeToOrigin = false;
         }
 
@@ -57,7 +62,8 @@ namespace Assets.Work.Scripts.Core.Objects
         private void Update()
         {
             Move(inputSO.MoveDirection);
-            Turn(inputSO.TurnValue);
+            // + => -, - => + 돼야 의도한 방향대로 돌음
+            Turn(-inputSO.TurnValue);
         }
 
         private void Move(Vector2 movementValue)
@@ -68,10 +74,16 @@ namespace Assets.Work.Scripts.Core.Objects
             Vector3 position = transform.position;
             float moveSpeed = movementSpeed * Time.deltaTime;
 
-            Vector3 moveValue = followCam.transform.right * movementValue.x + followCam.transform.forward * movementValue.y;
+            Vector3 moveValue = cinemachineCam.transform.right * movementValue.x + cinemachineCam.transform.forward * movementValue.y;
             moveValue.y = 0;
             moveValue.Normalize();
             moveValue *= moveSpeed;
+
+            if (moveSpeedApplyZoom)
+            {
+                // 줌에 따라 이속 변화
+                moveValue *= movementSpeed * cinemachineCam.Lens.OrthographicSize / maxZoomValue;
+            }
 
             position = new Vector3(Mathf.Clamp(position.x + moveValue.x, -_movementBoundValue.x, _movementBoundValue.x),
                 position.y,
@@ -89,7 +101,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
             _followCamRotationValue.y = Mathf.Clamp(_followCamRotationValue.y + value * turnSpeed, minTurnValue, maxTurnValue);
 
-            followCam.transform.rotation = Quaternion.Euler(_followCamRotationValue);
+            cinemachineCamParant.rotation = Quaternion.Euler(_followCamRotationValue);
         }
 
         private void HandleZoomDeltaValueChangeEvent(Vector2 deltaValue)
@@ -97,33 +109,40 @@ namespace Assets.Work.Scripts.Core.Objects
             if (_changeToOrigin)
                 return;
 
-            Vector3 offset = followCam.FollowOffset;
+            float size = cinemachineCam.Lens.OrthographicSize;
 
-            offset.y = Mathf.Clamp(offset.y - deltaValue.y * zoomSpeed, minZoomValue, maxZoomValue);
+            size = Mathf.Clamp(size - deltaValue.y * zoomSpeed, minZoomValue, maxZoomValue);
 
-            followCam.FollowOffset = offset;
+            cinemachineCam.Lens.OrthographicSize = size;
         }
 
         private void HandleResetKeyPressedEvent()
         {
-            if (_changeToOrigin)
+            bool applyMove = false;
+            if ((Time.time - _lastResetTime) < changeToOriginDuration)
+                applyMove = true;
+            else if (_changeToOrigin)
                 return;
 
             _changeToOrigin = true;
+            _lastResetTime = Time.time;
 
-            // move
-            Vector3 position = transform.position;
-            DOTween.To(() => position, value => position = value, new Vector3(startPosition.x, transform.position.y, startPosition.y), changeToOriginDuration)
-                .OnUpdate(() => transform.position = position);
+            if (applyMove)
+            {
+                // move
+                Vector3 position = transform.position;
+                DOTween.To(() => position, value => position = value, new Vector3(startPosition.x, transform.position.y, startPosition.y), changeToOriginDuration)
+                    .OnUpdate(() => transform.position = position);
+            }
 
             // rotation
             DOTween.To(() => _followCamRotationValue, value => _followCamRotationValue = value, _originCameraRotation, changeToOriginDuration)
-                .OnUpdate(() => followCam.transform.rotation = Quaternion.Euler(_followCamRotationValue));
+                .OnUpdate(() => cinemachineCamParant.transform.rotation = Quaternion.Euler(_followCamRotationValue));
 
             // zoom
-            float zoomOffset = followCam.FollowOffset.y;
+            float zoomOffset = cinemachineCam.Lens.OrthographicSize;
             DOTween.To(() => zoomOffset, value => zoomOffset = value, _originCameraZoom, changeToOriginDuration)
-                .OnUpdate(() => followCam.FollowOffset.y = zoomOffset)
+                .OnUpdate(() => cinemachineCam.Lens.OrthographicSize = zoomOffset)
                 .OnComplete(() => _changeToOrigin = false);
 
             /*
