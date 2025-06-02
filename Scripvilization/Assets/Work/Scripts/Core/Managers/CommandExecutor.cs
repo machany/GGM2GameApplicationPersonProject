@@ -14,8 +14,11 @@ namespace Assets.Work.Scripts.Core.Managers
     // 명령어의 메인 컨트롤러
     public class CommandExecutor : MonoBehaviour // 유효성 검사, 명령의 대상 받기, 명령어 실행, 최소한의 파싱
     {
+        [Header("Default Setting")]
         [SerializeField] private ObjectFinder objectManagerFinder;
         [SerializeField] protected EventChannelSO commandExecuteChannel;
+
+        [Header("Command Setting")]
         [SerializeField] protected string objectCallMeKeyword;
 
         public Action<string> OnErrorEvent;

@@ -39,12 +39,12 @@ namespace Assets.Work.Scripts.Core.Managers
                     for (int z = 0; z < gridSize.z; z++)
                     {
                         GridNode node = Grid.GetNode(x, y, z);
-                        Collider[] colliders = Physics.OverlapBox(node.center, nodeSize / 2, Quaternion.identity, sensedTargetLayer);
+                        Collider[] colliders = Physics.OverlapBox(node.center, nodeSize / 4, Quaternion.identity, sensedTargetLayer);
+                        node.nodeType = NodeType.Air;
 
                         if (colliders == null || colliders.Length <= 0)
                             continue;
 
-                        node.nodeType = NodeType.Air;
                         foreach (NodeTypeInfo nodeInfo in nodeInfoes)
                             if (((1 << colliders[0].gameObject.layer) & nodeInfo.NodeLayer) != 0)
                             {
@@ -56,41 +56,25 @@ namespace Assets.Work.Scripts.Core.Managers
 
         private void OnDrawGizmosSelected()
         {
-            Gizmos.color = Color.green;
+            if (Grid == null)
+                return;
 
             for (int x = 0; x < gridSize.x; x++)
                 for (int y = 0; y < gridSize.y; y++)
                     for (int z = 0; z < gridSize.z; z++)
                     {
-                        Vector3 center = transform.position
-                                       + new Vector3(x * nodeSize.x, y * nodeSize.y, z * nodeSize.z)
-                                       + (nodeSize / 2);
-
-                        if (Grid != null)
-                            switch (Grid.GetNode(x, y, z).nodeType)
-                            {
-                                case NodeType.Air:
-                                    Gizmos.color = Color.cyan;
-                                    break;
-                                case NodeType.Ground:
-                                    Gizmos.color = Color.green;
-                                    break;
-                                case NodeType.Wall:
-                                    // darkgreen
-                                    Gizmos.color = new Color(0.7f, 1f, 0.7f, 1f);
-                                    break;
-                                case NodeType.Block:
-                                    Gizmos.color = Color.red;
-                                    break;
-                                case NodeType.Home:
-                                    Gizmos.color = Color.yellow;
-                                    break;
-                                case NodeType.Resource:
-                                    Gizmos.color = Color.blue;
-                                    break;
-                            }
-
-                        Gizmos.DrawWireCube(center, nodeSize);
+                        Gizmos.color = Grid.GetNode(x, y, z).nodeType switch
+                        {
+                            NodeType.Air => Color.cyan,
+                            NodeType.Ground => Color.green,
+                            NodeType.Wall => new Color(0.5f, 1f, 0.5f, 1f),// darkgreen
+                            NodeType.Entity => Color.white,
+                            NodeType.Block => Color.red,
+                            NodeType.Home => Color.yellow,
+                            NodeType.Resource => Color.blue,
+                            _ => Color.black,
+                        };
+                        Gizmos.DrawWireCube(Grid.GetNode(x, y, z).center, nodeSize);
                     }
         }
 

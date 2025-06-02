@@ -12,6 +12,8 @@ namespace Assets.Work.Scripts.Executors
         // IScriptable로 가져오고 싶은데 인터페이스는 직렬화 안 되니, EntityExcutor니까 ScriptableEntity에 의존 해도 괜찮을 듯.
         [SerializeField] private ScriptableEntity scriptableOwner;
         [SerializeField] private EventChannelSO commandExecuteChannel;
+
+        [Header("Command Setting")]
         [SerializeField] private int commandExecuteInterval = 1000; // 명령어 작동 간격
 
         [SerializeField] // 이거 테스트용입니다. 변수는 테스트용이 아녜요.
@@ -53,14 +55,7 @@ namespace Assets.Work.Scripts.Executors
         {
             if (Repeat && !_executing)
             {
-                // 명령 실행 전 중지
-                if (_abort)
-                {
-                    Repeat = false;
-                    _abort = false;
-                }
-                else
-                    ExecuteCommands();
+                ExecuteCommands();
             }
         }
 
@@ -74,6 +69,14 @@ namespace Assets.Work.Scripts.Executors
 
             for (int i = 0; i < Commands.Length; i++)
             {
+                // 명령 실행 전 중지
+                if (_abort)
+                {
+                    Repeat = false;
+                    _abort = false;
+                    break;
+                }
+
                 commandExecuteChannel.InvokeEvent(CommandExecueteManageEvents.ExecuteCommandEvent.Initialize(Commands[i], scriptableOwner));
                 await Task.Delay(commandExecuteInterval);
             }
