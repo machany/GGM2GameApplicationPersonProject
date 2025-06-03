@@ -26,9 +26,12 @@ namespace Assets.Work.Scripts.Core.Objects
 
         [Header("Turn Setting")]
         [SerializeField] private Transform cinemachineCamParant;
-        [SerializeField] private float minTurnValue;
-        [SerializeField] private float maxTurnValue;
+        [SerializeField] private float xTurnRangeValue;
+        [SerializeField] private float yTurnRangeValue;
         [SerializeField] private float turnSpeed;
+
+        private bool _mouseClicked;
+        private bool _mouseOptionClicked;
 
         private Vector2 _movementBoundValue;
         private Vector3 _followCamRotationValue;
@@ -41,6 +44,10 @@ namespace Assets.Work.Scripts.Core.Objects
 
         private void Awake()
         {
+            inputSO.OnMouseSelectedStatusEvent += HandleMouseSelectedStatusEvent;
+            inputSO.OnMouseOptionClickStatusEvent += HandleMouseOptionClickStatusEvent;
+
+            inputSO.OnMouseMoveEvent += HandleMouseMoveEvent;
             inputSO.OnZoomDeltaValueChangeEvent += HandleZoomDeltaValueChangeEvent;
             inputSO.OnResetKeyPressedEvent += HandleResetKeyPressedEvent;
 
@@ -50,20 +57,28 @@ namespace Assets.Work.Scripts.Core.Objects
             _originCameraRotation = _followCamRotationValue;
             _originCameraZoom = cinemachineCam.Lens.OrthographicSize;
 
+            _mouseClicked = false;
             _changeToOrigin = false;
         }
 
         private void OnDestroy()
         {
+            inputSO.OnMouseSelectedStatusEvent -= HandleMouseSelectedStatusEvent;
+            inputSO.OnMouseOptionClickStatusEvent -= HandleMouseOptionClickStatusEvent;
+
+            inputSO.OnMouseMoveEvent -= HandleMouseMoveEvent;
             inputSO.OnZoomDeltaValueChangeEvent -= HandleZoomDeltaValueChangeEvent;
             inputSO.OnResetKeyPressedEvent -= HandleResetKeyPressedEvent;
         }
 
         private void Update()
         {
-            Move(inputSO.MoveDirection);
+            if (!(_mouseClicked || _mouseOptionClicked))
+            {
+                Move(inputSO.MoveDirection);
+                Turn(ref _followCamRotationValue.y, -inputSO.TurnValue, yTurnRangeValue);
+            }
             // + => -, - => + 돼야 의도한 방향대로 돌음
-            Turn(-inputSO.TurnValue);
         }
 
         private void Move(Vector2 movementValue)
@@ -74,8 +89,9 @@ namespace Assets.Work.Scripts.Core.Objects
             Vector3 position = transform.position;
             float moveSpeed = movementSpeed * Time.deltaTime;
 
-            Vector3 moveValue = cinemachineCam.transform.right * movementValue.x + cinemachineCam.transform.forward * movementValue.y;
-            moveValue.y = 0;
+            Quaternion yRotation = Quaternion.Euler(0f, cinemachineCam.transform.eulerAngles.y, 0f);
+            Vector3 inputDir = new Vector3(movementValue.x, 0f, movementValue.y);
+            Vector3 moveValue = yRotation * inputDir;
             moveValue.Normalize();
             moveValue *= moveSpeed;
 
@@ -92,16 +108,37 @@ namespace Assets.Work.Scripts.Core.Objects
             transform.position = position;
         }
 
-        private void Turn(float value)
+        private void Turn(ref float rotation, float value, float turnInterval)
         {
             if (_changeToOrigin)
                 return;
 
             float turnSpeed = this.turnSpeed * Time.deltaTime;
 
-            _followCamRotationValue.y = Mathf.Clamp(_followCamRotationValue.y + value * turnSpeed, minTurnValue, maxTurnValue);
+            rotation = Mathf.Clamp(rotation + value * turnSpeed, -turnInterval, turnInterval);
 
             cinemachineCamParant.rotation = Quaternion.Euler(_followCamRotationValue);
+        }
+
+        private void HandleMouseSelectedStatusEvent(bool clicked)
+        {
+            _mouseClicked = clicked;
+        }
+
+        private void HandleMouseOptionClickStatusEvent(bool clicked)
+        {
+            _mouseOptionClicked = clicked;
+        }
+
+        private void HandleMouseMoveEvent(Vector2 deltaValue)
+        {
+            if (_mouseClicked)
+                Move(deltaValue * -1);
+            else if (_mouseOptionClicked)
+            {
+                Turn(ref _followCamRotationValue.x, -deltaValue.y, xTurnRangeValue);
+                Turn(ref _followCamRotationValue.y, deltaValue.x, yTurnRangeValue);
+            }
         }
 
         private void HandleZoomDeltaValueChangeEvent(Vector2 deltaValue)

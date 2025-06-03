@@ -47,8 +47,10 @@ namespace Assets.Work.Scripts.Core.Inputs
         public event Action<float> OnTurnChangeEvent;
         public event Action OnResetKeyPressedEvent;
 
-        public event Action<Vector2> OnMouseMoveEvent;
+        public event Action<Vector2> OnMousePositionChangeEvent;
         public event Action<bool> OnMouseSelectedStatusEvent;
+        public event Action<bool> OnMouseOptionClickStatusEvent;
+        public event Action<Vector2> OnMouseMoveEvent;
 
         public void OnMove(InputAction.CallbackContext context)
         {
@@ -75,7 +77,7 @@ namespace Assets.Work.Scripts.Core.Inputs
 
         public void OnMousePosition(InputAction.CallbackContext context)
         {
-            OnMouseMoveEvent?.Invoke(context.ReadValue<Vector2>());
+            OnMousePositionChangeEvent?.Invoke(context.ReadValue<Vector2>());
         }
 
         public void OnMouseSelect(InputAction.CallbackContext context)
@@ -87,6 +89,20 @@ namespace Assets.Work.Scripts.Core.Inputs
                 OnMouseSelectedStatusEvent?.Invoke(false);
         }
 
+        public void OnMouseOption(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnMouseOptionClickStatusEvent?.Invoke(true);
+
+            if (context.canceled)
+                OnMouseOptionClickStatusEvent?.Invoke(false);
+        }
+
+        public void OnMouseMove(InputAction.CallbackContext context)
+        {
+            OnMouseMoveEvent?.Invoke(context.ReadValue<Vector2>());
+        }
+        
         #endregion
     }
 }

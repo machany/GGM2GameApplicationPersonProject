@@ -9,8 +9,7 @@ namespace Assets.Work.Scripts.Core._3DGrids
         Wall = 4, // 벽
         Entity = 8,
         Block = 16, // 어떤 방식으로도 못 지나감
-        Home = 32,
-        Resource = 64, // 추후 자원 타입 enum만들어서 관리
+        Goal = 32,
     }
 
     public class GridNode

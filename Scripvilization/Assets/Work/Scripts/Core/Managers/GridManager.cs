@@ -67,11 +67,10 @@ namespace Assets.Work.Scripts.Core.Managers
                         {
                             NodeType.Air => Color.cyan,
                             NodeType.Ground => Color.green,
-                            NodeType.Wall => new Color(0.5f, 1f, 0.5f, 1f),// darkgreen
-                            NodeType.Entity => Color.white,
-                            NodeType.Block => Color.red,
-                            NodeType.Home => Color.yellow,
-                            NodeType.Resource => Color.blue,
+                            NodeType.Wall => new Color(0.3f, 1f, 0.3f, 1f),// darkgreen
+                            NodeType.Entity => Color.yellow,
+                            NodeType.Block => Color.black,
+                            NodeType.Goal => Color.red,
                             _ => Color.black,
                         };
                         Gizmos.DrawWireCube(Grid.GetNode(x, y, z).center, nodeSize);

@@ -144,6 +144,24 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseMove"",
+                    ""type"": ""Value"",
+                    ""id"": ""32a9f333-0694-4b6c-8b66-528129caaea0"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MouseOption"",
+                    ""type"": ""Button"",
+                    ""id"": ""c0b6ba01-34d7-4e05-8007-f43414756090"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -342,6 +360,28 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Reset"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0191873a-4432-40ce-b503-49cb718f7d11"",
+                    ""path"": ""<Mouse>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MouseMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""19726ad3-6d3b-4836-96ba-6f2a773c29b3"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""MouseOption"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -935,6 +975,8 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         m_Player_Reset = m_Player.FindAction("Reset", throwIfNotFound: true);
         m_Player_MousePosition = m_Player.FindAction("MousePosition", throwIfNotFound: true);
         m_Player_MouseSelect = m_Player.FindAction("MouseSelect", throwIfNotFound: true);
+        m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
+        m_Player_MouseOption = m_Player.FindAction("MouseOption", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1034,6 +1076,8 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Reset;
     private readonly InputAction m_Player_MousePosition;
     private readonly InputAction m_Player_MouseSelect;
+    private readonly InputAction m_Player_MouseMove;
+    private readonly InputAction m_Player_MouseOption;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1069,6 +1113,14 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/MouseSelect".
         /// </summary>
         public InputAction @MouseSelect => m_Wrapper.m_Player_MouseSelect;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MouseMove".
+        /// </summary>
+        public InputAction @MouseMove => m_Wrapper.m_Player_MouseMove;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/MouseOption".
+        /// </summary>
+        public InputAction @MouseOption => m_Wrapper.m_Player_MouseOption;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1113,6 +1165,12 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseSelect.started += instance.OnMouseSelect;
             @MouseSelect.performed += instance.OnMouseSelect;
             @MouseSelect.canceled += instance.OnMouseSelect;
+            @MouseMove.started += instance.OnMouseMove;
+            @MouseMove.performed += instance.OnMouseMove;
+            @MouseMove.canceled += instance.OnMouseMove;
+            @MouseOption.started += instance.OnMouseOption;
+            @MouseOption.performed += instance.OnMouseOption;
+            @MouseOption.canceled += instance.OnMouseOption;
         }
 
         /// <summary>
@@ -1142,6 +1200,12 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseSelect.started -= instance.OnMouseSelect;
             @MouseSelect.performed -= instance.OnMouseSelect;
             @MouseSelect.canceled -= instance.OnMouseSelect;
+            @MouseMove.started -= instance.OnMouseMove;
+            @MouseMove.performed -= instance.OnMouseMove;
+            @MouseMove.canceled -= instance.OnMouseMove;
+            @MouseOption.started -= instance.OnMouseOption;
+            @MouseOption.performed -= instance.OnMouseOption;
+            @MouseOption.canceled -= instance.OnMouseOption;
         }
 
         /// <summary>
@@ -1484,6 +1548,20 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseSelect(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseMove(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseOption" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseOption(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
