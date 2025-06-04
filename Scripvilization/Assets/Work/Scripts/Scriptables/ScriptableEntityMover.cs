@@ -64,7 +64,7 @@ namespace Assets.Work.Scripts.Scriptables
         {
             _animator.AnimationChange(EntityAnimation.Move);
             _owner.Object.transform.DOMove(target, duration)
-                        .SetEase(Ease.Linear)
+                        .SetEase(Ease.InSine)
                         .OnComplete(() =>
                         {
                             _animator.AnimationChange(EntityAnimation.Idle);

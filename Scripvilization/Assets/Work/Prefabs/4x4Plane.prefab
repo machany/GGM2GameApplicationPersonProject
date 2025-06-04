@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6970704603966014904}
   - component: {fileID: 911851039350354981}
   - component: {fileID: 8061513709764159104}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6139599033309482354}
   - component: {fileID: 5900655994181295880}
   - component: {fileID: 7985483506409420677}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 2341003423265094047}
   - component: {fileID: 7348750037726578061}
   - component: {fileID: 1350693136146652937}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -269,7 +269,7 @@ GameObject:
   - component: {fileID: 2728169669872097021}
   - component: {fileID: 8758056212346990913}
   - component: {fileID: 6159822999064964429}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Floor (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -353,7 +353,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7738715148605318811}
-  - component: {fileID: 3178596492710136092}
+  - component: {fileID: 5010957651277763006}
   m_Layer: 6
   m_Name: 4x4Plane
   m_TagString: Untagged
@@ -380,7 +380,7 @@ Transform:
   - {fileID: 6970704603966014904}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &3178596492710136092
+--- !u!65 &5010957651277763006
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
