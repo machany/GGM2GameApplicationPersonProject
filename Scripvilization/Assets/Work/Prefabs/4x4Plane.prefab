@@ -11,9 +11,10 @@ GameObject:
   - component: {fileID: 6970704603966014904}
   - component: {fileID: 911851039350354981}
   - component: {fileID: 8061513709764159104}
+  - component: {fileID: 6219840978040037125}
   m_Layer: 6
   m_Name: Floor (3)
-  m_TagString: Untagged
+  m_TagString: WaveMover
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -86,6 +87,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6219840978040037125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379440023223017760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad004586d38d46a4192921356f89217a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaningObjectList: []
+  chainMovePowerMultiply: 0.9
+  moveToChainRatio: 0.2
+  waveMovertarget: WaveMover
+  sencingRange: 1
+  moveDirectionTest: {x: 0, y: 3, z: 0}
+  moveTimeTest: 1
 --- !u!1 &4712009220435687015
 GameObject:
   m_ObjectHideFlags: 0
@@ -97,9 +117,10 @@ GameObject:
   - component: {fileID: 6139599033309482354}
   - component: {fileID: 5900655994181295880}
   - component: {fileID: 7985483506409420677}
+  - component: {fileID: 6449809421373574110}
   m_Layer: 6
   m_Name: Floor (1)
-  m_TagString: Untagged
+  m_TagString: WaveMover
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -172,6 +193,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6449809421373574110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4712009220435687015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad004586d38d46a4192921356f89217a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaningObjectList: []
+  chainMovePowerMultiply: 0.9
+  moveToChainRatio: 0.2
+  waveMovertarget: WaveMover
+  sencingRange: 1
+  moveDirectionTest: {x: 0, y: 3, z: 0}
+  moveTimeTest: 1
 --- !u!1 &5984279012893661259
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,9 +223,10 @@ GameObject:
   - component: {fileID: 2341003423265094047}
   - component: {fileID: 7348750037726578061}
   - component: {fileID: 1350693136146652937}
+  - component: {fileID: 3309403687319751727}
   m_Layer: 6
   m_Name: Floor
-  m_TagString: Untagged
+  m_TagString: WaveMover
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -258,6 +299,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3309403687319751727
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5984279012893661259}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad004586d38d46a4192921356f89217a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaningObjectList: []
+  chainMovePowerMultiply: 0.9
+  moveToChainRatio: 0.2
+  waveMovertarget: WaveMover
+  sencingRange: 1
+  moveDirectionTest: {x: 0, y: 3, z: 0}
+  moveTimeTest: 1
 --- !u!1 &7265648220978944962
 GameObject:
   m_ObjectHideFlags: 0
@@ -269,9 +329,10 @@ GameObject:
   - component: {fileID: 2728169669872097021}
   - component: {fileID: 8758056212346990913}
   - component: {fileID: 6159822999064964429}
+  - component: {fileID: 4805943144137093406}
   m_Layer: 6
   m_Name: Floor (2)
-  m_TagString: Untagged
+  m_TagString: WaveMover
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -344,6 +405,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &4805943144137093406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7265648220978944962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad004586d38d46a4192921356f89217a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaningObjectList: []
+  chainMovePowerMultiply: 0.9
+  moveToChainRatio: 0.2
+  waveMovertarget: WaveMover
+  sencingRange: 1
+  moveDirectionTest: {x: 0, y: 3, z: 0}
+  moveTimeTest: 1
 --- !u!1 &7643870288730190141
 GameObject:
   m_ObjectHideFlags: 0

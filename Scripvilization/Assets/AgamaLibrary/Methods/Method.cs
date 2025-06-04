@@ -37,6 +37,16 @@ namespace AgamaLibrary.Methods
             return success;
         }
 
+        public static bool TryRemove<T>(this List<T> list, T value)
+        {
+            bool success = list.Contains(value);
+
+            if (success)
+                list.Remove(value);
+
+            return success;
+        }
+
         #endregion
 
         #region Dictionary
