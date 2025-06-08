@@ -34,7 +34,6 @@ namespace Assets.Work.Scripts.Core.Managers
                 TryRemoveObject(@event.beforeName);
                 TryAddObject(@event.newName, @event.scriptable);
             }
-            Debug.Log(@event.newName);
         }
 
         public bool TryAddObject(string name, IScriptable obj)

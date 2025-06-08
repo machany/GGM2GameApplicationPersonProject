@@ -816,6 +816,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Script",
+            "id": "f56ecad4-e2c5-4a09-bcae-b438867d361a",
+            "actions": [
+                {
+                    "name": "Submit",
+                    "type": "Button",
+                    "id": "c8827560-8a94-489e-b549-6c94f0cd9b3d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "dcb25a73-1804-4fbd-a63a-837561c0a513",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Submit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

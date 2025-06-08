@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace Assets.Work.Scripts.Core.Inputs
 {
     [CreateAssetMenu(fileName = "InputSO", menuName = "SO/Input", order = 0)]
-    public class InputSO : ScriptableObject, Controlls.IPlayerActions
+    public class InputSO : ScriptableObject, Controlls.IPlayerActions, Controlls.IScriptActions
     {
         #region Init
 
@@ -17,16 +17,19 @@ namespace Assets.Work.Scripts.Core.Inputs
             {
                 _controls = new Controlls();
                 _controls.Player.SetCallbacks(this);
+                _controls.Script.SetCallbacks(this);
             }
-            SetEnabled(true);
+            SetPlayerEnabled(true);
+            SetScriptEnabled(false);
         }
 
         private void OnDisable()
         {
-            SetEnabled(false);
+            SetPlayerEnabled(false);
+            SetScriptEnabled(false);
         }
 
-        public void SetEnabled(bool enabled)
+        public void SetPlayerEnabled(bool enabled)
         {
             if (enabled)
                 _controls.Player.Enable();
@@ -34,11 +37,20 @@ namespace Assets.Work.Scripts.Core.Inputs
                 _controls.Player.Disable();
         }
 
+        public void SetScriptEnabled(bool enabled)
+        {
+            if (enabled)
+                _controls.Script.Enable();
+            else
+                _controls.Script.Disable();
+        }
+
         #endregion
 
         #region Player Input
 
         public Vector2 MoveDirection { get; private set; }
+        public Vector2 MousePosition { get; private set; }
         public float TurnValue { get; private set; }
 
         public event Action<Vector2> OnMoveChangeEvent;
@@ -51,6 +63,20 @@ namespace Assets.Work.Scripts.Core.Inputs
         public event Action<bool> OnMouseSelectedStatusEvent;
         public event Action<bool> OnMouseOptionClickStatusEvent;
         public event Action<Vector2> OnMouseMoveEvent;
+
+        [SerializeField] private LayerMask canClickTarget;
+
+        public RaycastHit? GetWorldPosition()
+        {
+            Camera mainCam = Camera.main;
+            Debug.Assert(mainCam != null, "No main camera in this scene.");
+
+            Ray cameraRay = mainCam.ScreenPointToRay(MousePosition);
+            if (Physics.Raycast(cameraRay, out RaycastHit hit, mainCam.farClipPlane, canClickTarget))
+                return hit;
+
+            return null;
+        }
 
         public void OnMove(InputAction.CallbackContext context)
         {
@@ -77,7 +103,8 @@ namespace Assets.Work.Scripts.Core.Inputs
 
         public void OnMousePosition(InputAction.CallbackContext context)
         {
-            OnMousePositionChangeEvent?.Invoke(context.ReadValue<Vector2>());
+            MousePosition = context.ReadValue<Vector2>();
+            OnMousePositionChangeEvent?.Invoke(MousePosition);
         }
 
         public void OnMouseSelect(InputAction.CallbackContext context)
@@ -102,7 +129,19 @@ namespace Assets.Work.Scripts.Core.Inputs
         {
             OnMouseMoveEvent?.Invoke(context.ReadValue<Vector2>());
         }
-        
+
+        #endregion
+
+        #region Script
+
+        public event Action OnSubmitPressed;
+
+        public void OnSubmit(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnSubmitPressed?.Invoke();
+        }
+
         #endregion
     }
 }

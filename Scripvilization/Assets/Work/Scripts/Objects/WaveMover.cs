@@ -12,7 +12,7 @@ namespace Assets.Work.Scripts.Objects
         [Range(0, 1f)]
         [SerializeField] private float moveToChainRatio = 0.3f;
 
-        [SerializeField] private string waveMovertarget;
+        [SerializeField] private string waveMoverTag;
         [SerializeField] private float sencingRange;
 
         private bool _move;
@@ -47,8 +47,6 @@ namespace Assets.Work.Scripts.Objects
                     MoveToChaining(_movement, _moveTime);
                 }
             }
-
-            Debug.Log(_lifeTime);
         }
 
         private Vector3 ClacMove(float t, float lifeTime, Vector3 movePower)
@@ -79,9 +77,9 @@ namespace Assets.Work.Scripts.Objects
         }
 
         [ContextMenu("Set Chaning Object")]
-        private void SetChaningObjects()
+        public void SetChaningObjects()
         {
-            GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(waveMovertarget);
+            GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(waveMoverTag);
 
             chaningObjectList.Clear();
 

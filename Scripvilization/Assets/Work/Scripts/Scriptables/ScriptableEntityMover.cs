@@ -20,7 +20,6 @@ namespace Assets.Work.Scripts.Scriptables
             Debug.Assert(_owner != null, "Can't cast to ScriptableEntity from entity.");
 
             SetNodeTypes(out _canMoveNodeTypes, canMoveNodes);
-            Debug.Log(_canMoveNodeTypes);
 
             _animator = entity.GetCompo<EntityAnimator>();
         }

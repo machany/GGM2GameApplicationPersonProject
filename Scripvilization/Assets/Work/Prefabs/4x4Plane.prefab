@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 911851039350354981}
   - component: {fileID: 8061513709764159104}
   - component: {fileID: 6219840978040037125}
+  - component: {fileID: 202713474616485431}
   m_Layer: 6
   m_Name: Floor (3)
   m_TagString: WaveMover
@@ -102,10 +103,31 @@ MonoBehaviour:
   chaningObjectList: []
   chainMovePowerMultiply: 0.9
   moveToChainRatio: 0.2
-  waveMovertarget: WaveMover
+  waveMoverTag: WaveMover
   sencingRange: 1
   moveDirectionTest: {x: 0, y: 3, z: 0}
   moveTimeTest: 1
+--- !u!65 &202713474616485431
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 379440023223017760}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4712009220435687015
 GameObject:
   m_ObjectHideFlags: 0
@@ -118,6 +140,7 @@ GameObject:
   - component: {fileID: 5900655994181295880}
   - component: {fileID: 7985483506409420677}
   - component: {fileID: 6449809421373574110}
+  - component: {fileID: 1326580763218822229}
   m_Layer: 6
   m_Name: Floor (1)
   m_TagString: WaveMover
@@ -208,10 +231,31 @@ MonoBehaviour:
   chaningObjectList: []
   chainMovePowerMultiply: 0.9
   moveToChainRatio: 0.2
-  waveMovertarget: WaveMover
+  waveMoverTag: WaveMover
   sencingRange: 1
   moveDirectionTest: {x: 0, y: 3, z: 0}
   moveTimeTest: 1
+--- !u!65 &1326580763218822229
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4712009220435687015}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5984279012893661259
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,6 +268,7 @@ GameObject:
   - component: {fileID: 7348750037726578061}
   - component: {fileID: 1350693136146652937}
   - component: {fileID: 3309403687319751727}
+  - component: {fileID: 16916237755390627}
   m_Layer: 6
   m_Name: Floor
   m_TagString: WaveMover
@@ -314,10 +359,31 @@ MonoBehaviour:
   chaningObjectList: []
   chainMovePowerMultiply: 0.9
   moveToChainRatio: 0.2
-  waveMovertarget: WaveMover
+  waveMoverTag: WaveMover
   sencingRange: 1
   moveDirectionTest: {x: 0, y: 3, z: 0}
   moveTimeTest: 1
+--- !u!65 &16916237755390627
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5984279012893661259}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7265648220978944962
 GameObject:
   m_ObjectHideFlags: 0
@@ -330,6 +396,7 @@ GameObject:
   - component: {fileID: 8758056212346990913}
   - component: {fileID: 6159822999064964429}
   - component: {fileID: 4805943144137093406}
+  - component: {fileID: 1554698542513941381}
   m_Layer: 6
   m_Name: Floor (2)
   m_TagString: WaveMover
@@ -420,10 +487,31 @@ MonoBehaviour:
   chaningObjectList: []
   chainMovePowerMultiply: 0.9
   moveToChainRatio: 0.2
-  waveMovertarget: WaveMover
+  waveMoverTag: WaveMover
   sencingRange: 1
   moveDirectionTest: {x: 0, y: 3, z: 0}
   moveTimeTest: 1
+--- !u!65 &1554698542513941381
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7265648220978944962}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7643870288730190141
 GameObject:
   m_ObjectHideFlags: 0
@@ -433,7 +521,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7738715148605318811}
-  - component: {fileID: 5010957651277763006}
   m_Layer: 6
   m_Name: 4x4Plane
   m_TagString: Untagged
@@ -460,24 +547,3 @@ Transform:
   - {fileID: 6970704603966014904}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &5010957651277763006
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7643870288730190141}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 1, z: 2}
-  m_Center: {x: 0, y: 0, z: 0}

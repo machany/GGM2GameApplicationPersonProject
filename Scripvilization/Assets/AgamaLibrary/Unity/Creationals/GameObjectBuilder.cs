@@ -12,7 +12,7 @@ namespace AgamaLibrary.Unity.Creationals
 
         public GameObjectBuilder(GameObject obj = null)//, string presetDefult = "Defult")
         {
-            targetGameObject = obj ?? new GameObject();
+            // targetGameObject = obj ?? new GameObject();
             //presetDefaultKey = presetDefult;
         }
 
