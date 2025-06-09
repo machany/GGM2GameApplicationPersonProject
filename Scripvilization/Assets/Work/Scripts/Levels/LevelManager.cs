@@ -23,7 +23,7 @@ namespace Assets.Work.Scripts.Levels
         private void Start()
         {
             _currentLevel = 1;
-            stageEventChannel.InvokeEvent(StageEvents.StageClearEvent.Init(_currentLevel));
+            stageEventChannel.InvokeEvent(StageEvents.NextStageEvent.Init(_currentLevel));
         }
 
         private void OnDestroy()
@@ -39,6 +39,10 @@ namespace Assets.Work.Scripts.Levels
 
         private void HandleArrivedGoalEvent(ArrivedGoalEvent @event)
         {
+            Debug.Log($"{_currentLevel} // {needClearGoals.Length}");
+            if (_currentLevel > needClearGoals.Length)
+                return;
+
             ++_currentArrivedGoal;
 
             if (_currentArrivedGoal >= needClearGoals[_currentLevel - 1])
@@ -47,12 +51,27 @@ namespace Assets.Work.Scripts.Levels
 
         private async void CheackClear()
         {
+            ++_currentLevel;
+            stageEventChannel.InvokeEvent(StageEvents.StageClearEvent);
             await Task.Delay(clearDelay);
-            if (_currentArrivedGoal >= needClearGoals[_currentLevel - 1])
-            {
-                ++_currentLevel;
-                stageEventChannel.InvokeEvent(StageEvents.StageClearEvent.Init(_currentLevel));
-            }
+            stageEventChannel.InvokeEvent(StageEvents.NextStageEvent.Init(_currentLevel));
         }
+
+#if UNITY_EDITOR
+
+        [Header("Editor")]
+        [SerializeField] private int levelTest;
+        [SerializeField] private bool allActiveTest;
+
+        [ContextMenu("Apply Level")]
+        private void ApplyLevelTest()
+        {
+            StageObject[] stageObjects = Resources.FindObjectsOfTypeAll<StageObject>();
+
+            foreach (StageObject stageObject in stageObjects)
+                stageObject.TestApplyLevel(allActiveTest, levelTest);
+        }
+
+#endif
     }
 }

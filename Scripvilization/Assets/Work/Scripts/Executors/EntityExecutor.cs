@@ -12,12 +12,13 @@ namespace Assets.Work.Scripts.Executors
         // IScriptable로 가져오고 싶은데 인터페이스는 직렬화 안 되니, EntityExcutor니까 ScriptableEntity에 의존 해도 괜찮을 듯.
         [SerializeField] private ScriptableEntity scriptableOwner;
         [SerializeField] private EventChannelSO commandExecuteChannel;
+        [SerializeField] private EventChannelSO stageEventChannel;
 
         [Header("Command Setting")]
         [SerializeField] private int commandExecuteInterval = 1000; // 명령어 작동 간격
 
-        [SerializeField] // 이거 테스트용입니다. 변수는 테스트용이 아녜요.
-        private bool _repeat; // 반복여부
+        // 생각해보니 시작상태에서 돌아다니는 얘가 필요할 듯
+        [SerializeField] private bool _repeat; // 반복여부
         public bool Repeat
         {
             get => _repeat;
@@ -30,7 +31,7 @@ namespace Assets.Work.Scripts.Executors
             }
         }
 
-        private string[] _commands; // 명령어 목록
+        [SerializeField] private string[] _commands; // 명령어 목록
         public string[] Commands
         {
             get => _commands;
@@ -46,9 +47,17 @@ namespace Assets.Work.Scripts.Executors
 
         private void Awake()
         {
-            Repeat = false;
             _executing = false;
             _abort = false;
+
+            stageEventChannel.AddListener<StageClearEvent>(HandleStageClearEvent);
+            scriptableOwner.OnFail += Abort;
+        }
+
+        private void OnDestroy()
+        {
+            stageEventChannel.RemoveListener<StageClearEvent>(HandleStageClearEvent);
+            scriptableOwner.OnFail -= Abort;
         }
 
         private void Update()
@@ -59,9 +68,9 @@ namespace Assets.Work.Scripts.Executors
             }
         }
 
-        private async void ExecuteCommands()
+        public async void ExecuteCommands()
         {
-            if (_executing || Commands == null)
+            if (_executing || Commands == null || Commands.Length == 0)
                 return;
 
             _abort = false;
@@ -69,6 +78,8 @@ namespace Assets.Work.Scripts.Executors
 
             for (int i = 0; i < Commands.Length; i++)
             {
+                await Task.Delay(commandExecuteInterval);
+
                 // 명령 실행 전 중지
                 if (_abort)
                 {
@@ -78,7 +89,6 @@ namespace Assets.Work.Scripts.Executors
                 }
 
                 commandExecuteChannel.InvokeEvent(CommandExecueteManageEvents.ExecuteCommandEvent.Initialize(Commands[i], scriptableOwner));
-                await Task.Delay(commandExecuteInterval);
             }
 
             _executing = false;
@@ -89,16 +99,12 @@ namespace Assets.Work.Scripts.Executors
             _abort = true;
         }
 
-#if UNITY_EDITOR
-
-        [Header("Test")]
-        [SerializeField] private string[] commandsTest;
-
-        [ContextMenu("Apply Comannd")]
-        private void ApplyCommandTest()
+        private void HandleStageClearEvent(StageClearEvent @event)
         {
-            Commands = commandsTest;
+            Abort();
         }
+
+#if UNITY_EDITOR
 
         [ContextMenu("Excute Comannd")]
         private void ExecuteCommandTest()

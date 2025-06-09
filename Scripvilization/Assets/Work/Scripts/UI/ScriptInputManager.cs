@@ -1,6 +1,5 @@
 ﻿using Assets.Work.Scripts.Core.Inputs;
 using DG.Tweening;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,79 +8,72 @@ namespace Assets.Work.Scripts.UI
     public class ScriptInputManager : MonoBehaviour
     {
         [SerializeField] private InputSO inputSO;
+        [SerializeField] private ScriptInputBlock scriptInputBlock;
 
-        [Header("Script Setting")]
-        [SerializeField] private GameObject scriptInputBlockPrefab;
-        [SerializeField] private ushort minScriptBlock;
-        [SerializeField] private ushort maxScriptBlock;
-
-        [Header("Pannel Setting")]
-        [SerializeField] private RectTransform pannel;
+        [Header("Slide Setting")]
+        [SerializeField] private RectTransform panel;
         [SerializeField] private Vector2 visiblePosition;
         [SerializeField] private Vector2 hidePosition;
-        [SerializeField] private float sildeTime;
+        [SerializeField] private float slideTime;
 
         private Vector2 _pannelStartPosition;
 
-        private List<ScriptInputBlock> _scriptInputBlockList;
-
-        private ushort _scriptIndex;
+        private bool _opened = false;
 
         private void Awake()
         {
-            _scriptInputBlockList = new List<ScriptInputBlock>();
-            _pannelStartPosition = pannel.position;
-
-            for (int i = 0; i < minScriptBlock; ++i)
-                CreateScriptInputBlock();
-
-            inputSO.OnSubmitPressed += HandleSubmintEvent;
+            _pannelStartPosition = panel.position;
         }
 
         private void OnDestroy()
         {
-            DesubscribeScriptBlock(_scriptIndex);
-
-            inputSO.OnSubmitPressed -= HandleSubmintEvent;
+            SetInput(false);
         }
 
         public void SetText(string[] value)
         {
-            for (int i = 0; i < value.Length; ++i)
-            {
-                if (_scriptInputBlockList.Count >= maxScriptBlock)
-                    return;
-
-                if (i + 1 >= _scriptInputBlockList.Count)
-                    CreateScriptInputBlock();
-
-                _scriptInputBlockList[i].SetText(value[i]);
-            }
+            scriptInputBlock.SetText(value);
         }
 
+        // 분리 필요
         [ContextMenu("Open")]
         public void Open()
         {
-            Silde(false);
+            if (_opened)
+                return;
 
-            SetInput(true);
-            _scriptIndex = 0;
-            SubscribeScriptBlock(_scriptIndex);
-            _scriptInputBlockList[_scriptIndex].Select();
+            _opened = true;
+            Silde(!_opened);
+
+            SetInput(_opened);
         }
 
+        // 분리 필요
         [ContextMenu("Close")]
         public void Close()
         {
-            Silde(true);
+            if (!_opened)
+                return;
 
-            SetInput(false);
-            DesubscribeScriptBlock(_scriptIndex);
+            _opened = false;
+            Silde(_opened);
+
+            SetInput(!_opened);
         }
 
-        // 분리 필요?
         private void SetInput(bool on)
         {
+            if (on)
+            {
+                scriptInputBlock.OnDeselectEvent += HandleDeselectEvent;
+                inputSO.OnMouseClickEvent += HandleMouseClick;
+            }
+            else
+            {
+                scriptInputBlock.OnDeselectEvent -= HandleDeselectEvent;
+                inputSO.OnMouseClickEvent -= HandleMouseClick;
+            }
+
             inputSO.SetPlayerEnabled(!on);
             inputSO.SetScriptEnabled(on);
         }
@@ -90,53 +82,28 @@ namespace Assets.Work.Scripts.UI
         private void Silde(bool hide)
         {
             if (hide)
-                pannel.DOMove(_pannelStartPosition + hidePosition, sildeTime).SetEase(Ease.Linear).OnComplete(() => pannel.gameObject.SetActive(false));
+                panel.DOMove(_pannelStartPosition + hidePosition, slideTime).SetEase(Ease.Linear).OnComplete(() => panel.gameObject.SetActive(false));
             else
             {
-                pannel.gameObject.SetActive(true);
-                pannel.DOMove(_pannelStartPosition + visiblePosition, sildeTime).SetEase(Ease.Linear);
+                panel.gameObject.SetActive(true);
+                panel.DOMove(_pannelStartPosition + visiblePosition, slideTime).SetEase(Ease.Linear);
             }
         }
 
-        private void CreateScriptInputBlock()
+        private void HandleDeselectEvent(string[] scripts)
         {
-            ScriptInputBlock scriptInputBlock = Instantiate(scriptInputBlockPrefab).GetComponent<ScriptInputBlock>();
-
-            scriptInputBlock.transform.SetParent(transform);
-            scriptInputBlock.transform.SetSiblingIndex(0);
-
-            _scriptInputBlockList.Add(scriptInputBlock);
+            SaveScript(scripts);
         }
 
-        private void SubscribeScriptBlock(int index)
+        private void HandleMouseClick()
         {
-            _scriptInputBlockList[index].OnDeselectEvent += HandleDeselectEvent;
-        }
-
-        private void DesubscribeScriptBlock(int index)
-        {
-            _scriptInputBlockList[index].OnDeselectEvent -= HandleDeselectEvent;
-        }
-
-        private void HandleSubmintEvent()
-        {
-            DesubscribeScriptBlock(_scriptIndex);
-
-            if (++_scriptIndex >= _scriptInputBlockList.Count)
-            {
-                if (_scriptInputBlockList.Count >= maxScriptBlock)
-                    return;
-
-                CreateScriptInputBlock();
-            }
-
-            SubscribeScriptBlock(_scriptIndex);
-            _scriptInputBlockList[_scriptIndex].Select();
-        }
-
-        private void HandleDeselectEvent(string script)
-        {
+            if (!EventSystem.current.IsPointerOverGameObject())
                 Close();
+        }
+
+        private void SaveScript(string[] scripts)
+        {
+            Debug.Log("as");
         }
     }
 }

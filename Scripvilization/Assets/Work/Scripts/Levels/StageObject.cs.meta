@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 5e1ef549fdae8fe40b471c3fb822f279
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - stageEventChannel: {fileID: 11400000, guid: 04380b8bf1e67e9409f45117769de4a2, type: 2}
+  - gridManagerFinder: {fileID: 11400000, guid: ad01606156af73e4f97f02a816fa4747, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

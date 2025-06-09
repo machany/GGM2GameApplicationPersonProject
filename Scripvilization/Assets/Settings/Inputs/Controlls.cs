@@ -908,9 +908,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             ""id"": ""f56ecad4-e2c5-4a09-bcae-b438867d361a"",
             ""actions"": [
                 {
-                    ""name"": ""Submit"",
+                    ""name"": ""MouseClick"",
                     ""type"": ""Button"",
-                    ""id"": ""c8827560-8a94-489e-b549-6c94f0cd9b3d"",
+                    ""id"": ""363f0c89-a743-4360-b760-d43cbda684b6"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -920,12 +920,12 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""dcb25a73-1804-4fbd-a63a-837561c0a513"",
-                    ""path"": ""<Keyboard>/enter"",
+                    ""id"": ""b3e422b2-120d-4b99-b3d6-9b24d0edbb75"",
+                    ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Submit"",
+                    ""action"": ""MouseClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1019,7 +1019,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         // Script
         m_Script = asset.FindActionMap("Script", throwIfNotFound: true);
-        m_Script_Submit = m_Script.FindAction("Submit", throwIfNotFound: true);
+        m_Script_MouseClick = m_Script.FindAction("MouseClick", throwIfNotFound: true);
     }
 
     ~@Controlls()
@@ -1470,7 +1470,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
     // Script
     private readonly InputActionMap m_Script;
     private List<IScriptActions> m_ScriptActionsCallbackInterfaces = new List<IScriptActions>();
-    private readonly InputAction m_Script_Submit;
+    private readonly InputAction m_Script_MouseClick;
     /// <summary>
     /// Provides access to input actions defined in input action map "Script".
     /// </summary>
@@ -1483,9 +1483,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// </summary>
         public ScriptActions(@Controlls wrapper) { m_Wrapper = wrapper; }
         /// <summary>
-        /// Provides access to the underlying input action "Script/Submit".
+        /// Provides access to the underlying input action "Script/MouseClick".
         /// </summary>
-        public InputAction @Submit => m_Wrapper.m_Script_Submit;
+        public InputAction @MouseClick => m_Wrapper.m_Script_MouseClick;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1512,9 +1512,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         {
             if (instance == null || m_Wrapper.m_ScriptActionsCallbackInterfaces.Contains(instance)) return;
             m_Wrapper.m_ScriptActionsCallbackInterfaces.Add(instance);
-            @Submit.started += instance.OnSubmit;
-            @Submit.performed += instance.OnSubmit;
-            @Submit.canceled += instance.OnSubmit;
+            @MouseClick.started += instance.OnMouseClick;
+            @MouseClick.performed += instance.OnMouseClick;
+            @MouseClick.canceled += instance.OnMouseClick;
         }
 
         /// <summary>
@@ -1526,9 +1526,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// <seealso cref="ScriptActions" />
         private void UnregisterCallbacks(IScriptActions instance)
         {
-            @Submit.started -= instance.OnSubmit;
-            @Submit.performed -= instance.OnSubmit;
-            @Submit.canceled -= instance.OnSubmit;
+            @MouseClick.started -= instance.OnMouseClick;
+            @MouseClick.performed -= instance.OnMouseClick;
+            @MouseClick.canceled -= instance.OnMouseClick;
         }
 
         /// <summary>
@@ -1777,11 +1777,11 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
     public interface IScriptActions
     {
         /// <summary>
-        /// Method invoked when associated input action "Submit" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "MouseClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnSubmit(InputAction.CallbackContext context);
+        void OnMouseClick(InputAction.CallbackContext context);
     }
 }

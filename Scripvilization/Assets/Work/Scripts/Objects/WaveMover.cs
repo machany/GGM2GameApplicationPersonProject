@@ -69,9 +69,9 @@ namespace Assets.Work.Scripts.Objects
             _lifeTime = 0;
         }
 
-        private void MoveToChaining(Vector3 movePower, float moveTime)
+        public void MoveToChaining(Vector3 movePower, float moveTime)
         {
-                    _chaining = true;
+            _chaining = true;
             foreach (WaveMover chainedMover in chaningObjectList)
                 chainedMover.Move(movePower * chainMovePowerMultiply, moveTime * chainMovePowerMultiply);
         }

@@ -12,3 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 518a0cbfe64b6c14fb8fe9d2a2906d54, type: 3}
   m_Name: InputSO
   m_EditorClassIdentifier: 
+  canClickTarget:
+    serializedVersion: 2
+    m_Bits: 704

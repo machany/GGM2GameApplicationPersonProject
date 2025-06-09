@@ -1,60 +1,60 @@
 ﻿using System;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 namespace Assets.Work.Scripts.UI
 {
     public class ScriptInputBlock : MonoBehaviour
     {
         [SerializeField] private TMP_InputField inputField;
-        [SerializeField] private int maxTextCount;
+        [SerializeField] private int maxScriptLineLength;
 
-        public Action<string> OnSubmintEvent;
-        public Action<string> OnDeselectEvent;
+        public Action<string[]> OnDeselectEvent;
 
         private void Awake()
         {
-            inputField.onValueChanged.AddListener(HandleScriptChange);
-            inputField.onSubmit.AddListener(HandleScriptSubmit);
             inputField.onDeselect.AddListener(HandleDeselect);
+            inputField.onEndEdit.AddListener(ForceFocus);
+
+            inputField.characterLimit = 0;
+            inputField.lineLimit = maxScriptLineLength;
+            inputField.resetOnDeActivation = false;
+
+            inputField.lineType = TMP_InputField.LineType.MultiLineNewline;
         }
 
         private void OnDestroy()
         {
-            inputField.onValueChanged.RemoveListener(HandleScriptChange);
-            inputField.onSubmit.RemoveListener(HandleScriptSubmit);
             inputField.onDeselect.RemoveListener(HandleDeselect);
+            inputField.onEndEdit.RemoveListener(ForceFocus);
         }
 
-        public void HandleScriptChange(string value)
-        {
-            if (value.Length >= maxTextCount)
-                value = value.Substring(0, maxTextCount);
-            inputField.text = value;
-        }
+        private void HandleDeselect(string value)
+            => OnDeselectEvent?.Invoke(StringToScript(value));
 
-        public void HandleScriptSubmit(string value)
-        {
-            OnSubmintEvent?.Invoke(value);
-        }
+        private string[] StringToScript(string value)
+            => value.Split('\n');
 
-        public void HandleDeselect(string value)
+        public void SetText(string[] scripts)
         {
-            OnDeselectEvent?.Invoke(value);
-        }
-
-        public void Select()
-        {
-            inputField.Select();
-            inputField.ActivateInputField();
-        }
-
-        public void SetText(string text)
-        {
-            if (text.Length >= maxTextCount)
-                text = text.Substring(0, maxTextCount);
+            string text = string.Join("\n", scripts);
             inputField.text = text;
+        }
+
+        private async void ForceFocus(string value)
+        {
+            await Task.Yield();
+
+            int caretPos = inputField.caretPosition;
+
+            string text = inputField.text;
+            string newText = text.Insert(caretPos, "\n");
+
+            inputField.text = newText;
+            inputField.ActivateInputField();
+
+            inputField.caretPosition = caretPos + 1;
         }
     }
 }

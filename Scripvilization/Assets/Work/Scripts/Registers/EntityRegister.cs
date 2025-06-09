@@ -70,7 +70,7 @@ namespace Assets.Work.Scripts.Registers
                 {
                     try
                     {
-                        entity.GetCompo<ScriptableEntityMover>().MoveTo(node, _moveDuration);
+                        entity.MoveTo(node, _moveDuration);
                     }
                     catch (Exception ex)
                     {

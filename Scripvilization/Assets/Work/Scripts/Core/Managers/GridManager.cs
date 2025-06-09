@@ -1,5 +1,6 @@
 ﻿using Assets.Work.Scripts.Core._3DGrids;
 using System;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace Assets.Work.Scripts.Core.Managers
@@ -21,6 +22,7 @@ namespace Assets.Work.Scripts.Core.Managers
         [SerializeField] private NodeTypeInfo[] nodeInfoes;
 
         public Core._3DGrids.Grid Grid { get; private set; }
+        private int _sensedTargetLayer;
 
         private void Awake()
         {
@@ -30,28 +32,32 @@ namespace Assets.Work.Scripts.Core.Managers
 
         private void Initialize()
         {
-            int sensedTargetLayer = 0;
             foreach (NodeTypeInfo layer in nodeInfoes)
-                sensedTargetLayer |= layer.NodeLayer;
+                _sensedTargetLayer |= layer.NodeLayer;
 
             for (int x = 0; x < gridSize.x; x++)
                 for (int y = 0; y < gridSize.y; y++)
                     for (int z = 0; z < gridSize.z; z++)
                     {
                         GridNode node = Grid.GetNode(x, y, z);
-                        Collider[] colliders = Physics.OverlapBox(node.center, nodeSize / 4, Quaternion.identity, sensedTargetLayer);
-                        node.nodeType = NodeType.Air;
-
-                        if (colliders == null || colliders.Length <= 0)
-                            continue;
-
-                        foreach (NodeTypeInfo nodeInfo in nodeInfoes)
-                            if (((1 << colliders[0].gameObject.layer) & nodeInfo.NodeLayer) != 0)
-                            {
-                                node.nodeType = nodeInfo.NodeType;
-                                break;
-                            }
+                        BakeNode(node);
                     }
+        }
+
+        public void BakeNode(GridNode node)
+        {
+            Collider[] colliders = Physics.OverlapBox(node.center, nodeSize / 4, Quaternion.identity, _sensedTargetLayer);
+            node.nodeType = NodeType.Air;
+
+            if (colliders == null || colliders.Length <= 0)
+                return;
+
+            foreach (NodeTypeInfo nodeInfo in nodeInfoes)
+                if (((1 << colliders[0].gameObject.layer) & nodeInfo.NodeLayer) != 0)
+                {
+                    node.nodeType = nodeInfo.NodeType;
+                    break;
+                }
         }
 
         private void OnDrawGizmosSelected()

@@ -1,7 +1,9 @@
 ﻿using AgamaLibrary.Unity.EventSystem;
+using Assets.Work.Scripts.Core._3DGrids;
 using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Entities;
 using Assets.Work.Scripts.Sriptable;
+using System;
 using UnityEngine;
 
 namespace Assets.Work.Scripts.Scriptables
@@ -25,6 +27,9 @@ namespace Assets.Work.Scripts.Scriptables
             }
         }
 
+        public Func<GridNode, float, bool> OnMove;
+        public Action OnFail;
+
         protected virtual void OnEnable()
         {
             objectMangeEventChannel.InvokeEvent(ObjectManageEvents.ChangeObjectEvent.Initialize(false, this, ObjectName));
@@ -46,7 +51,14 @@ namespace Assets.Work.Scripts.Scriptables
 
         }
 
+        public void MoveTo(GridNode node, float moveDuration)
+        {
+            if (!(OnMove?.Invoke(node, moveDuration) ?? false))
+                OnFail?.Invoke();
+        }
+
 #if UNITY_EDITOR
+
         [Header("Test")]
         [SerializeField] private string objectNameTest;
         [ContextMenu("SetOptions Option")]
@@ -54,6 +66,7 @@ namespace Assets.Work.Scripts.Scriptables
         {
             ObjectName = objectNameTest;
         }
+
 #endif
     }
 }

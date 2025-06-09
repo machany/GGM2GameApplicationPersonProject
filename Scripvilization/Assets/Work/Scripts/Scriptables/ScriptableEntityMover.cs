@@ -22,6 +22,12 @@ namespace Assets.Work.Scripts.Scriptables
             SetNodeTypes(out _canMoveNodeTypes, canMoveNodes);
 
             _animator = entity.GetCompo<EntityAnimator>();
+            _owner.OnMove += MoveTo;
+        }
+
+        private void OnDestroy()
+        {
+            _owner.OnMove -= MoveTo;
         }
 
         public virtual bool MoveTo(GridNode target, float duration)
@@ -29,30 +35,21 @@ namespace Assets.Work.Scripts.Scriptables
             if (((int)target.nodeType & _canMoveNodeTypes) > 0)
             {
                 Vector3 direction = target.center - _owner.Object.transform.position;
-                if (direction.magnitude == 0)
+                if (direction.sqrMagnitude < 0.001f)
                     return false;
 
-                Vector3 rotation = _owner.Object.transform.eulerAngles;
-                Vector3 lookRotation = Quaternion.LookRotation(direction).eulerAngles;
+                Quaternion rotation = _owner.Object.transform.rotation;
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
 
                 // 좀 더 깔끔하게 하고싶은데..
                 // DOTween에서 벗어나서 목적지가 정해지면 그 쪽으로 움직이게
                 // 회전도 마찬가지로
                 // move, turn 함수에서 연산하고 update하게
                 // 시간이 오래걸릴듯
-                if (Mathf.Abs(rotation.y - lookRotation.y) < 0.001f)
-                    Move(target.center, duration);
-                else {
-                    float rotateDuration = duration / 3;
+                float rotateDuration = duration / 3;
 
-                    DOTween.To(() => rotation.y,
-                    v => rotation.y = v,
-                    lookRotation.y > 180 ? 180 - lookRotation.y : lookRotation.y,
-                    rotateDuration)
-                        .OnUpdate(() =>
-                        _owner.Object.transform.rotation = Quaternion.Euler(rotation))
-                        .OnComplete(() => Move(target.center, rotateDuration * 2));
-                }
+                _owner.Object.transform.DORotateQuaternion(lookRotation, rotateDuration)
+                    .OnComplete(() => Move(target.center, rotateDuration * 2));
 
                 return true;
             }

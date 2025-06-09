@@ -27,9 +27,15 @@ namespace Assets.Work.Scripts.Levels
             stageEventChannelSO.AddListener<StageClearEvent>(HandleStageClear);
         }
 
+        private void OnDestroy()
+        {
+            stageEventChannelSO.RemoveListener<StageClearEvent>(HandleStageClear);
+        }
+
         private void HandleStageClear(StageClearEvent @event)
         {
-            waveMover.Move(moveDirection, moveTime);
+            waveMover.MoveToChaining(moveDirection, moveTime);
+            gameObject.SetActive(false);
         }
 
         private void OnTriggerEnter(Collider collision)

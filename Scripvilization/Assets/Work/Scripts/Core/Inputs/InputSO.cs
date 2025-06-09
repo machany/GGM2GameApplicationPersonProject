@@ -134,12 +134,12 @@ namespace Assets.Work.Scripts.Core.Inputs
 
         #region Script
 
-        public event Action OnSubmitPressed;
+        public event Action OnMouseClickEvent;
 
-        public void OnSubmit(InputAction.CallbackContext context)
+        public void OnMouseClick(InputAction.CallbackContext context)
         {
             if (context.performed)
-                OnSubmitPressed?.Invoke();
+                OnMouseClickEvent?.Invoke();
         }
 
         #endregion

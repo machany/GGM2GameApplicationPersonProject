@@ -2,7 +2,7 @@
 
 namespace Assets.Work.Scripts.Core.Finders
 {
-    [DefaultExecutionOrder(-1)]
+    [DefaultExecutionOrder(-5)]
     public class FinderManager : MonoBehaviour
     {
         [SerializeField] protected ObjectFinder finder;

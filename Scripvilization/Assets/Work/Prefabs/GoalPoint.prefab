@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6210649669763566510}
   - component: {fileID: 4037914091336318144}
   - component: {fileID: 7705401449359934153}
+  - component: {fileID: 292948650071200}
   m_Layer: 0
   m_Name: GoalPoint
   m_TagString: WaveMover
@@ -94,6 +95,22 @@ MonoBehaviour:
   sencingRange: 1
   moveDirectionTest: {x: 0, y: 0, z: 0}
   moveTimeTest: 0
+--- !u!114 &292948650071200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7369839270788499568}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e1ef549fdae8fe40b471c3fb822f279, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stageEventChannel: {fileID: 11400000, guid: 04380b8bf1e67e9409f45117769de4a2, type: 2}
+  gridManagerFinder: {fileID: 11400000, guid: ad01606156af73e4f97f02a816fa4747, type: 2}
+  fadeTime: 1
+  activeStages: 
 --- !u!1001 &4314106998981518242
 PrefabInstance:
   m_ObjectHideFlags: 0

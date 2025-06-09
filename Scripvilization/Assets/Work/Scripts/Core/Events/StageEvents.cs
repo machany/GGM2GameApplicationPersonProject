@@ -9,6 +9,7 @@ namespace Assets.Work.Scripts.Core.Events
 {
     public class StageEvents
     {
+        public static NextStageEvent NextStageEvent = new NextStageEvent();
         public static StageClearEvent StageClearEvent = new StageClearEvent();
         public static ArrivedGoalEvent ArrivedGoalEvent = new ArrivedGoalEvent();
         public static LeavedGoalEvent LeavedGoalEvent = new LeavedGoalEvent();
@@ -16,9 +17,13 @@ namespace Assets.Work.Scripts.Core.Events
 
     public class StageClearEvent : GameEvent
     {
+    }
+
+    public class NextStageEvent : GameEvent
+    {
         public int stage;
 
-        public StageClearEvent Init(int stage)
+        public NextStageEvent Init(int stage)
         {
             this.stage = stage;
             return this;
@@ -31,6 +36,5 @@ namespace Assets.Work.Scripts.Core.Events
 
     public class LeavedGoalEvent : GameEvent
     {
-
     }
 }
