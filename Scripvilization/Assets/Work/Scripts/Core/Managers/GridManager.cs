@@ -52,10 +52,17 @@ namespace Assets.Work.Scripts.Core.Managers
             if (colliders == null || colliders.Length <= 0)
                 return;
 
-            foreach (NodeTypeInfo nodeInfo in nodeInfoes)
-                if (((1 << colliders[0].gameObject.layer) & nodeInfo.NodeLayer) != 0)
+            // 콜라이더들의 레이어들 저장해서
+            int colliderLayers = 0;
+
+            foreach (Collider col in colliders)
+                colliderLayers |= 1 << col.gameObject.layer;
+
+            // 뒤에서 부터 저장된 레이어 비교 후 뭔가 걸리면 그 타입으로 지정함.
+            for (int i = nodeInfoes.Length - 1; i >= 0; --i)
+                if ((colliderLayers & nodeInfoes[i].NodeLayer) != 0)
                 {
-                    node.nodeType = nodeInfo.NodeType;
+                    node.nodeType = nodeInfoes[i].NodeType;
                     break;
                 }
         }

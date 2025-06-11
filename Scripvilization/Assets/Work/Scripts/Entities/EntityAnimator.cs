@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.Work.Scripts.Executors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Assets.Work.Scripts.Entities
         Move,
     }
 
-    public class EntityAnimator : MonoBehaviour, IEntityComponent
+    public class EntityAnimator : MonoBehaviour, IEntityComponent, IRunner
     {
         [Serializable]
         public class AnimationInformation
@@ -53,5 +54,10 @@ namespace Assets.Work.Scripts.Entities
 
         public void SetParameter(EntityAnimation entityAnimation, float value)
             => animator.SetFloat(_animationSet[entityAnimation], value);
+
+        public void Kill()
+        {
+            AnimationChange(EntityAnimation.Idle);
+        }
     }
 }

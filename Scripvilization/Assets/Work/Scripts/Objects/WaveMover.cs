@@ -12,7 +12,7 @@ namespace Assets.Work.Scripts.Objects
         [Range(0, 1f)]
         [SerializeField] private float moveToChainRatio = 0.3f;
 
-        [SerializeField] private string waveMoverTag;
+        //[SerializeField] private string waveMoverTag;
         [SerializeField] private float sencingRange;
 
         private bool _move;
@@ -27,6 +27,10 @@ namespace Assets.Work.Scripts.Objects
         private void Awake()
         {
             _move = _chaining = false;
+        }
+
+        private void Start()
+        {
             SetChaningObjects();
         }
 
@@ -50,9 +54,7 @@ namespace Assets.Work.Scripts.Objects
         }
 
         private Vector3 ClacMove(float t, float lifeTime, Vector3 movePower)
-        {
-            return Mathf.Sin(t * (Mathf.PI / lifeTime)) * movePower;
-        }
+            => Mathf.Sin(t * (Mathf.PI / lifeTime)) * movePower;
 
         public void Move(Vector3 movePower, float moveTime)
         {
@@ -73,20 +75,20 @@ namespace Assets.Work.Scripts.Objects
         {
             _chaining = true;
             foreach (WaveMover chainedMover in chaningObjectList)
-                chainedMover.Move(movePower * chainMovePowerMultiply, moveTime * chainMovePowerMultiply);
+                if (chainedMover != null && chainedMover.gameObject.activeSelf)
+                    chainedMover.Move(movePower * chainMovePowerMultiply, moveTime * chainMovePowerMultiply);
         }
 
         [ContextMenu("Set Chaning Object")]
-        public void SetChaningObjects()
+        private void SetChaningObjects()
         {
-            GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(waveMoverTag);
+            WaveMover[] wavemovers = GameObject.FindObjectsOfType<WaveMover>(true);//.FindGameObjectsWithTag(waveMoverTag);
 
             chaningObjectList.Clear();
 
-            foreach (GameObject gameObject in gameObjects)
-                if (Vector3.Distance(gameObject.transform.position, transform.position) <= sencingRange)
-                    if (gameObject.TryGetComponent(out WaveMover mover))
-                        chaningObjectList.Add(mover);
+            foreach (WaveMover mover in wavemovers)
+                if (Vector3.Distance(mover.transform.position, transform.position) <= sencingRange)
+                    chaningObjectList.Add(mover);
 
             chaningObjectList.TryRemove(this);
         }

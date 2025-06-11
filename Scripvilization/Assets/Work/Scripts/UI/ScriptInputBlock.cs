@@ -12,22 +12,32 @@ namespace Assets.Work.Scripts.UI
 
         public Action<string[]> OnDeselectEvent;
 
+        private int _caretPosition;
+        private string _text;
+        private bool _valueChangeLock;
+
         private void Awake()
         {
             inputField.onDeselect.AddListener(HandleDeselect);
-            inputField.onEndEdit.AddListener(ForceFocus);
+            inputField.onValueChanged.AddListener(HandleValueChange);
+            inputField.onSubmit.AddListener(ForceFocus);
 
             inputField.characterLimit = 0;
             inputField.lineLimit = maxScriptLineLength;
             inputField.resetOnDeActivation = false;
-
-            inputField.lineType = TMP_InputField.LineType.MultiLineNewline;
         }
 
         private void OnDestroy()
         {
             inputField.onDeselect.RemoveListener(HandleDeselect);
-            inputField.onEndEdit.RemoveListener(ForceFocus);
+            inputField.onValueChanged.RemoveListener(HandleValueChange);
+            inputField.onSubmit.RemoveListener(ForceFocus);
+        }
+
+        private void HandleValueChange(string value)
+        {
+            _caretPosition = inputField.caretPosition;
+            _text = inputField.text;
         }
 
         private void HandleDeselect(string value)
@@ -42,19 +52,22 @@ namespace Assets.Work.Scripts.UI
             inputField.text = text;
         }
 
-        private async void ForceFocus(string value)
+        private void ForceFocus(string value)
         {
-            await Task.Yield();
+            if (_valueChangeLock)
+                return;
 
-            int caretPos = inputField.caretPosition;
+            _valueChangeLock = true;
 
-            string text = inputField.text;
-            string newText = text.Insert(caretPos, "\n");
-
+            Debug.Log(_caretPosition);
+            string newText = _text.Insert(Mathf.Max(_caretPosition, _text.Length - 1), "\n");
+            Debug.Log(newText);
             inputField.text = newText;
             inputField.ActivateInputField();
 
-            inputField.caretPosition = caretPos + 1;
+            inputField.caretPosition = _caretPosition + 1;
+
+            _valueChangeLock = false;
         }
     }
 }

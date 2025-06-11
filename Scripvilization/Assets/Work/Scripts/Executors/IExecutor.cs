@@ -4,7 +4,7 @@ namespace Assets.Work.Scripts.Executors
 {
     public interface IExecutor : IArchivedMethods 
     {
-        public bool Repeat { get; }
+        public bool Repeat { get; set; }
         public string[] Commands { get; }
 
         public void ExecuteCommands();

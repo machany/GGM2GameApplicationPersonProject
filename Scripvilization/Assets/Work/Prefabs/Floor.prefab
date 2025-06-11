@@ -143,5 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stageEventChannel: {fileID: 11400000, guid: 04380b8bf1e67e9409f45117769de4a2, type: 2}
   gridManagerFinder: {fileID: 11400000, guid: ad01606156af73e4f97f02a816fa4747, type: 2}
+  waveMover: {fileID: 8429711220848428392}
+  needResetPos: 0
   fadeTime: 1
   activeStages: 
+  startActive: 0

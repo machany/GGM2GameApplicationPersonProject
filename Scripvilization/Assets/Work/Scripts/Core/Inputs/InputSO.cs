@@ -57,7 +57,7 @@ namespace Assets.Work.Scripts.Core.Inputs
         public event Action<Vector2> OnZoomDeltaValueChangeEvent;
 
         public event Action<float> OnTurnChangeEvent;
-        public event Action OnResetKeyPressedEvent;
+        public event Action<bool> OnResetStatusEvent;
 
         public event Action<Vector2> OnMousePositionChangeEvent;
         public event Action<bool> OnMouseSelectedStatusEvent;
@@ -98,7 +98,10 @@ namespace Assets.Work.Scripts.Core.Inputs
         public void OnReset(InputAction.CallbackContext context)
         {
             if (context.performed)
-                OnResetKeyPressedEvent?.Invoke();
+                OnResetStatusEvent?.Invoke(true);
+
+            if (context.canceled)
+                OnResetStatusEvent?.Invoke(false);
         }
 
         public void OnMousePosition(InputAction.CallbackContext context)

@@ -16,6 +16,7 @@ namespace Assets.Work.Scripts.Executors
 
         [Header("Command Setting")]
         [SerializeField] private int commandExecuteInterval = 1000; // 명령어 작동 간격
+        [SerializeField] private bool ignoreAbortRepeat;
 
         // 생각해보니 시작상태에서 돌아다니는 얘가 필요할 듯
         [SerializeField] private bool _repeat; // 반복여부
@@ -24,10 +25,10 @@ namespace Assets.Work.Scripts.Executors
             get => _repeat;
             set
             {
-                _abort = false;
-
                 _repeat = value;
                 // 반복은 활성상태 상관없이 중단없음.
+                if (_repeat == true)
+                    _abort = false;
             }
         }
 
@@ -51,13 +52,11 @@ namespace Assets.Work.Scripts.Executors
             _abort = false;
 
             stageEventChannel.AddListener<StageClearEvent>(HandleStageClearEvent);
-            scriptableOwner.OnFail += Abort;
         }
 
         private void OnDestroy()
         {
             stageEventChannel.RemoveListener<StageClearEvent>(HandleStageClearEvent);
-            scriptableOwner.OnFail -= Abort;
         }
 
         private void Update()
@@ -83,7 +82,7 @@ namespace Assets.Work.Scripts.Executors
                 // 명령 실행 전 중지
                 if (_abort)
                 {
-                    Repeat = false;
+                    Repeat = ignoreAbortRepeat || false;
                     _abort = false;
                     break;
                 }

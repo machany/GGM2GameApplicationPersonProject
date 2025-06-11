@@ -1,7 +1,10 @@
 ﻿using AgamaLibrary.Unity.EventSystem;
 using Assets.Work.Scripts.Core.Events;
+using Assets.Work.Scripts.Core.Inputs;
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Windows;
 
 namespace Assets.Work.Scripts.Levels
 {
@@ -14,10 +17,14 @@ namespace Assets.Work.Scripts.Levels
         private int _currentLevel;
         private int _currentArrivedGoal;
 
+        private StageObject[] _stageObjects;
+
         private void Awake()
         {
             stageEventChannel.AddListener<ArrivedGoalEvent>(HandleArrivedGoalEvent);
             stageEventChannel.AddListener<LeavedGoalEvent>(HandleLeavedGoalEvent);
+
+            _stageObjects = Resources.FindObjectsOfTypeAll<StageObject>();
         }
 
         private void Start()
@@ -32,6 +39,11 @@ namespace Assets.Work.Scripts.Levels
             stageEventChannel.RemoveListener<LeavedGoalEvent>(HandleLeavedGoalEvent);
         }
 
+        private void HandleResetKeyPressed()
+        {
+            stageEventChannel.InvokeEvent(StageEvents.ResetStageEvent);
+        }
+
         private void HandleLeavedGoalEvent(LeavedGoalEvent @event)
         {
             --_currentArrivedGoal;
@@ -39,7 +51,6 @@ namespace Assets.Work.Scripts.Levels
 
         private void HandleArrivedGoalEvent(ArrivedGoalEvent @event)
         {
-            Debug.Log($"{_currentLevel} // {needClearGoals.Length}");
             if (_currentLevel > needClearGoals.Length)
                 return;
 
@@ -57,6 +68,12 @@ namespace Assets.Work.Scripts.Levels
             stageEventChannel.InvokeEvent(StageEvents.NextStageEvent.Init(_currentLevel));
         }
 
+        private void ApplyLevel(int level)
+        {
+            foreach (StageObject stageObject in _stageObjects)
+                stageObject.ApplyLevel(false, level);
+        }
+
 #if UNITY_EDITOR
 
         [Header("Editor")]
@@ -69,7 +86,7 @@ namespace Assets.Work.Scripts.Levels
             StageObject[] stageObjects = Resources.FindObjectsOfTypeAll<StageObject>();
 
             foreach (StageObject stageObject in stageObjects)
-                stageObject.TestApplyLevel(allActiveTest, levelTest);
+                stageObject.ApplyLevel(allActiveTest, levelTest);
         }
 
 #endif

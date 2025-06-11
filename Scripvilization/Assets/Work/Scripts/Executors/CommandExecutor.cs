@@ -1,6 +1,7 @@
 ﻿using AgamaLibrary.Unity.EventSystem;
 using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Core.Finders;
+using Assets.Work.Scripts.Core.Managers;
 using Assets.Work.Scripts.Sriptable;
 using MethodArchiveSystem;
 using System;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.Work.Scripts.Core.Managers
+namespace Assets.Work.Scripts.Executors
 {
     [DefaultExecutionOrder(-10)]
     // 명령어의 메인 컨트롤러

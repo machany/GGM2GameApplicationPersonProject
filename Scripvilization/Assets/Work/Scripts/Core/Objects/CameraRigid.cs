@@ -26,7 +26,8 @@ namespace Assets.Work.Scripts.Core.Objects
 
         [Header("Turn Setting")]
         [SerializeField] private Transform cinemachineCamParant;
-        [SerializeField] private float xTurnRangeValue;
+        [SerializeField] private float minXTurnRangeValue;
+        [SerializeField] private float maxXTurnRangeValue;
         [SerializeField] private float yTurnRangeValue;
         [SerializeField] private float turnSpeed;
 
@@ -49,7 +50,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
             inputSO.OnMouseMoveEvent += HandleMouseMoveEvent;
             inputSO.OnZoomDeltaValueChangeEvent += HandleZoomDeltaValueChangeEvent;
-            inputSO.OnResetKeyPressedEvent += HandleResetKeyPressedEvent;
+            inputSO.OnResetStatusEvent += HandleResetKeyPressedEvent;
 
             _movementBoundValue = startPosition + movementBounds / 2;
             _followCamRotationValue = cinemachineCamParant.transform.eulerAngles;
@@ -68,7 +69,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
             inputSO.OnMouseMoveEvent -= HandleMouseMoveEvent;
             inputSO.OnZoomDeltaValueChangeEvent -= HandleZoomDeltaValueChangeEvent;
-            inputSO.OnResetKeyPressedEvent -= HandleResetKeyPressedEvent;
+            inputSO.OnResetStatusEvent -= HandleResetKeyPressedEvent;
         }
 
         private void Update()
@@ -76,7 +77,7 @@ namespace Assets.Work.Scripts.Core.Objects
             if (!(_mouseClicked || _mouseOptionClicked))
             {
                 Move(inputSO.MoveDirection);
-                Turn(ref _followCamRotationValue.y, -inputSO.TurnValue, yTurnRangeValue);
+                Turn(ref _followCamRotationValue.y, -inputSO.TurnValue, -yTurnRangeValue, yTurnRangeValue);
             }
             // + => -, - => + 돼야 의도한 방향대로 돌음
         }
@@ -108,14 +109,14 @@ namespace Assets.Work.Scripts.Core.Objects
             transform.position = position;
         }
 
-        private void Turn(ref float rotation, float value, float turnInterval)
+        private void Turn(ref float rotation, float value, float min, float max)
         {
             if (_changeToOrigin)
                 return;
 
             float turnSpeed = this.turnSpeed * Time.deltaTime;
 
-            rotation = Mathf.Clamp(rotation + value * turnSpeed, -turnInterval, turnInterval);
+            rotation = Mathf.Clamp(rotation + value * turnSpeed, min, max);
 
             cinemachineCamParant.rotation = Quaternion.Euler(_followCamRotationValue);
         }
@@ -136,8 +137,8 @@ namespace Assets.Work.Scripts.Core.Objects
                 Move(deltaValue * -1);
             else if (_mouseOptionClicked)
             {
-                Turn(ref _followCamRotationValue.x, -deltaValue.y, xTurnRangeValue);
-                Turn(ref _followCamRotationValue.y, deltaValue.x, yTurnRangeValue);
+                Turn(ref _followCamRotationValue.x, -deltaValue.y, minXTurnRangeValue, maxXTurnRangeValue);
+                Turn(ref _followCamRotationValue.y, deltaValue.x, -yTurnRangeValue, yTurnRangeValue);
             }
         }
 
@@ -153,8 +154,11 @@ namespace Assets.Work.Scripts.Core.Objects
             cinemachineCam.Lens.OrthographicSize = size;
         }
 
-        private void HandleResetKeyPressedEvent()
+        private void HandleResetKeyPressedEvent(bool status)
         {
+            if (!status)
+                return;
+
             bool applyMove = false;
             if ((Time.time - _lastResetTime) < changeToOriginDuration)
                 applyMove = true;

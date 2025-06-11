@@ -11,6 +11,7 @@ namespace Assets.Work.Scripts.Core.Events
     {
         public static NextStageEvent NextStageEvent = new NextStageEvent();
         public static StageClearEvent StageClearEvent = new StageClearEvent();
+        public static ResetStageEvent ResetStageEvent = new ResetStageEvent();
         public static ArrivedGoalEvent ArrivedGoalEvent = new ArrivedGoalEvent();
         public static LeavedGoalEvent LeavedGoalEvent = new LeavedGoalEvent();
     }
@@ -28,6 +29,10 @@ namespace Assets.Work.Scripts.Core.Events
             this.stage = stage;
             return this;
         }
+    }
+
+    public class ResetStageEvent : GameEvent
+    {
     }
 
     public class ArrivedGoalEvent : GameEvent

@@ -1,16 +1,19 @@
 ﻿using Assets.Work.Scripts.Core._3DGrids;
 using Assets.Work.Scripts.Entities;
+using Assets.Work.Scripts.Executors;
 using DG.Tweening;
 using UnityEngine;
 
 namespace Assets.Work.Scripts.Scriptables
 {
-    public class ScriptableEntityMover : MonoBehaviour, IEntityComponent
+    public class ScriptableEntityMover : MonoBehaviour, IEntityComponent, IRunner
     {
         [SerializeField] private NodeType[] canMoveNodes;
 
         private ScriptableEntity _owner;
         private EntityAnimator _animator;
+
+        private DG.Tweening.Tween _tween;
 
         private int _canMoveNodeTypes;
 
@@ -22,6 +25,7 @@ namespace Assets.Work.Scripts.Scriptables
             SetNodeTypes(out _canMoveNodeTypes, canMoveNodes);
 
             _animator = entity.GetCompo<EntityAnimator>();
+            Debug.Assert(_animator != null, "Animator is null");
             _owner.OnMove += MoveTo;
         }
 
@@ -48,7 +52,7 @@ namespace Assets.Work.Scripts.Scriptables
                 // 시간이 오래걸릴듯
                 float rotateDuration = duration / 3;
 
-                _owner.Object.transform.DORotateQuaternion(lookRotation, rotateDuration)
+                _tween = _owner.Object.transform.DORotateQuaternion(lookRotation, rotateDuration)
                     .OnComplete(() => Move(target.center, rotateDuration * 2));
 
                 return true;
@@ -59,7 +63,7 @@ namespace Assets.Work.Scripts.Scriptables
         private void Move(Vector3 target, float duration)
         {
             _animator.AnimationChange(EntityAnimation.Move);
-            _owner.Object.transform.DOMove(target, duration)
+            _tween = _owner.Object.transform.DOMove(target, duration)
                         .SetEase(Ease.InSine)
                         .OnComplete(() =>
                         {
@@ -72,9 +76,17 @@ namespace Assets.Work.Scripts.Scriptables
         {
             nodeTypes = 0;
             foreach (NodeType nodeType in canMoveNodes)
-            {
                 nodeTypes |= (int)nodeType;
+        }
+
+        public void Kill()
+        {
+            if (_tween != null)
+            {
+                _tween.Complete();
+                _tween.Kill();
             }
+            _tween = null;
         }
     }
 }

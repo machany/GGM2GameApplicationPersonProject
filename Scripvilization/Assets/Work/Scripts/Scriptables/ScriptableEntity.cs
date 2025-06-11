@@ -28,7 +28,6 @@ namespace Assets.Work.Scripts.Scriptables
         }
 
         public Func<GridNode, float, bool> OnMove;
-        public Action OnFail;
 
         protected virtual void OnEnable()
         {
@@ -53,8 +52,7 @@ namespace Assets.Work.Scripts.Scriptables
 
         public void MoveTo(GridNode node, float moveDuration)
         {
-            if (!(OnMove?.Invoke(node, moveDuration) ?? false))
-                OnFail?.Invoke();
+            OnMove?.Invoke(node, moveDuration);
         }
 
 #if UNITY_EDITOR

@@ -1,7 +1,9 @@
 ﻿using Assets.Work.Scripts.Core.Inputs;
 using DG.Tweening;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 namespace Assets.Work.Scripts.UI
 {
@@ -56,9 +58,9 @@ namespace Assets.Work.Scripts.UI
                 return;
 
             _opened = false;
-            Silde(_opened);
+            Silde(!_opened);
 
-            SetInput(!_opened);
+            SetInput(_opened);
         }
 
         private void SetInput(bool on)
@@ -97,8 +99,22 @@ namespace Assets.Work.Scripts.UI
 
         private void HandleMouseClick()
         {
-            if (!EventSystem.current.IsPointerOverGameObject())
+            if (!CheckUI())
                 Close();
+        }
+
+        private bool CheckUI()
+        {
+            PointerEventData eventData = new PointerEventData(EventSystem.current)
+            {
+                position = Mouse.current.position.ReadValue()
+            };
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+
+            bool checkOverlapUI = results.Count > 0;
+            return checkOverlapUI;
         }
 
         private void SaveScript(string[] scripts)
