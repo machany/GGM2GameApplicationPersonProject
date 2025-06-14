@@ -20,9 +20,11 @@ namespace Assets.Work.Scripts.Executors
             stageEventChannel.AddListener<StageClearEvent>(HandleStageClearEvent);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             stageEventChannel.RemoveListener<StageClearEvent>(HandleStageClearEvent);
+
+            base.OnDestroy();
         }
 
         private void HandleStageClearEvent(StageClearEvent @event)

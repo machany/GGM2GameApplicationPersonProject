@@ -2,6 +2,7 @@ using AgamaLibrary.Unity.EventSystem;
 using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Sriptable;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.Work.Scripts.Core.Managers
@@ -10,12 +11,17 @@ namespace Assets.Work.Scripts.Core.Managers
     public class ObjectManager : MonoBehaviour
     {
         [SerializeField] protected EventChannelSO objectMangeEventChannel;
+        [field : SerializeField] public string objectCallMeKeyword { get; private set; }
+
+        public HashSet<string> commandKeywords;
 
         private Dictionary<string, IScriptable> _objectDict;
 
         private void Awake()
         {
             _objectDict = new Dictionary<string, IScriptable>();
+            commandKeywords = new HashSet<string>();
+
             objectMangeEventChannel.AddListener<ChangeObjectEvent>(HandleChangeObjectEvent);
         }
 
@@ -30,6 +36,9 @@ namespace Assets.Work.Scripts.Core.Managers
                 TryRemoveObject(@event.newName);
             else
             {
+                if (commandKeywords.Contains(@event.newName) || EqualityComparer<string>.Default.Equals(@event.newName, objectCallMeKeyword))
+                    return;
+
                 // 기존 객체 삭제 후 새로 등록
                 TryRemoveObject(@event.beforeName);
                 TryAddObject(@event.newName, @event.scriptable);

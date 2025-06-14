@@ -44,9 +44,9 @@ namespace Assets.Work.Scripts.Scriptables
             objectMangeEventChannel.InvokeEvent(ObjectManageEvents.ChangeObjectEvent.Initialize(true, this, ObjectName));
         }
 
-        public void MoveTo(GridNode node, float moveDuration)
+        public bool? MoveTo(GridNode node, float moveDuration)
         {
-            OnMove?.Invoke(node, moveDuration);
+            return OnMove?.Invoke(node, moveDuration);
         }
 
         public virtual void Execute()

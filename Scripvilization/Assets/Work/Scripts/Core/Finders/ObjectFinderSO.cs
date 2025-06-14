@@ -3,7 +3,7 @@
 namespace Assets.Work.Scripts.Core.Finders
 {
     [CreateAssetMenu(fileName = "ObjectFinder", menuName = "SO/ObjecFinder", order = 0)]
-    public class ObjectFinder : ScriptableObject
+    public class ObjectFinderSO : ScriptableObject
     {
         public GameObject Object { get; set; }
 

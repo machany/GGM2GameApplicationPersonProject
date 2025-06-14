@@ -2,6 +2,7 @@
 using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Core.Inputs;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -24,11 +25,17 @@ namespace Assets.Work.Scripts.Levels
             stageEventChannel.AddListener<ArrivedGoalEvent>(HandleArrivedGoalEvent);
             stageEventChannel.AddListener<LeavedGoalEvent>(HandleLeavedGoalEvent);
 
-            _stageObjects = Resources.FindObjectsOfTypeAll<StageObject>();
+            _stageObjects = GameObject.FindObjectsByType<StageObject>(FindObjectsSortMode.None);
         }
 
         private void Start()
         {
+            StartCoroutine(DelayStart());
+        }
+
+        private IEnumerator DelayStart()
+        {
+            yield return null;
             _currentLevel = 1;
             stageEventChannel.InvokeEvent(StageEvents.NextStageEvent.Init(_currentLevel));
         }

@@ -20,7 +20,7 @@ namespace Assets.Work.Scripts.Registers
         }
 
         [Header("Default Set")]
-        [SerializeField] private ObjectFinder gridManagerFinder;
+        [SerializeField] private ObjectFinderSO gridManagerFinder;
 
         [Header("Move")]
         [SerializeField] private float moveDuration;
@@ -33,10 +33,14 @@ namespace Assets.Work.Scripts.Registers
 
         private void Awake()
         {
-            _gridManager = gridManagerFinder.GetObject<GridManager>();
             _moveDuration = moveDuration;
 
             InitializeDirectionDict();
+        }
+
+        private void Start()
+        {
+            _gridManager = gridManagerFinder.GetObject<GridManager>();
         }
 
         private void InitializeDirectionDict()
@@ -53,7 +57,7 @@ namespace Assets.Work.Scripts.Registers
         }
 
         [ArchiveMethod("이동")]
-        public static void Move(IScriptable target, string direction)
+        public static bool? Move(IScriptable target, string direction)
         {
             Vector3Int nodePosition = _gridManager.Grid.GetWorldToNodePosition(target.Object.transform.position);
 
@@ -63,26 +67,35 @@ namespace Assets.Work.Scripts.Registers
                 GridNode node = _gridManager.Grid.GetNode(nodePosition);
 
                 if (node == null)
-                    return;
+                    return null;
 
                 target.Execute();
                 if (target is ScriptableEntity entity)
                 {
                     try
                     {
-                        entity.MoveTo(node, _moveDuration);
+                        bool? success = entity.MoveTo(node, _moveDuration);
+
+                        if (success == false)
+                            success = null;
+
+                        return success;
                     }
                     catch (Exception ex)
                     {
                         Debug.LogException(ex);
+                        return null;
                     }
                 }
                 else
                 {
                     target.Object.transform.position = node.center;
                     target.Complete();
+                    return true;
                 }
             }
+            else
+                return null;
         }
     }
 }

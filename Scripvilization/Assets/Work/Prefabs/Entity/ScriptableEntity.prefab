@@ -1690,7 +1690,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ee04e748c549ce4f823f73e2147a933, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  commandExecuteChannel: {fileID: 11400000, guid: e9a6d930a4a711a4da65e6278ff1e3f2, type: 2}
+  commandExecutorFinder: {fileID: 11400000, guid: ddefcafd7efba9b4388669257b61983f, type: 2}
   commandExecuteInterval: 2500
   _commands: []
   _repeat: 0

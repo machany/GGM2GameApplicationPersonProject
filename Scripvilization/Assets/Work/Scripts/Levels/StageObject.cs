@@ -3,6 +3,7 @@ using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Core.Finders;
 using Assets.Work.Scripts.Core.Managers;
 using DG.Tweening;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,7 +13,7 @@ namespace Assets.Work.Scripts.Levels
     public class StageObject : MonoBehaviour
     {
         [SerializeField] private EventChannelSO stageEventChannel;
-        [SerializeField] private ObjectFinder gridManagerFinder;
+        [SerializeField] private ObjectFinderSO gridManagerFinder;
         [SerializeField] private bool needResetPos;
         [SerializeField] private float fadeTime;
         [SerializeField] private int[] activeStages;
@@ -26,6 +27,8 @@ namespace Assets.Work.Scripts.Levels
         private Vector3 _originScale;
         private GridManager _gridManager;
 
+        public event Action<bool, int> OnActiveChangeEvent;
+
         private void Awake()
         {
             _activeStageSet = new HashSet<int>();
@@ -35,8 +38,6 @@ namespace Assets.Work.Scripts.Levels
                 _activeStageSet.Add(stage);
             }
 
-            _gridManager = gridManagerFinder.GetObject<GridManager>();
-
             _originScale = transform.localScale;
 
             if (needResetPos)
@@ -45,14 +46,19 @@ namespace Assets.Work.Scripts.Levels
                 _resetRotation = transform.rotation;
             }
 
-            transform.localScale = Vector3.zero;
-
             stageEventChannel.AddListener<NextStageEvent>(HandleStageClear);
             if (needResetPos)
                 stageEventChannel.AddListener<ResetStageEvent>(HandleResetEvent);
 
+            transform.localScale = Vector3.zero;
+        }
+
+        private void Start()
+        {
             _active = false;
             gameObject.SetActive(false);
+
+            _gridManager = gridManagerFinder.GetObject<GridManager>();
             _gridManager.BakeNode(_gridManager.Grid.GetWorldPositionToNode(transform.position));
         }
 
@@ -81,6 +87,8 @@ namespace Assets.Work.Scripts.Levels
                 Active();
             else
                 Deactive();
+
+            OnActiveChangeEvent?.Invoke(_active, @event.stage);
         }
 
         private void Active()

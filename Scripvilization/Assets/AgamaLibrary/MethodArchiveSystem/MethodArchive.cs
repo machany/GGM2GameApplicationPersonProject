@@ -15,11 +15,11 @@ namespace MethodArchiveSystem
             archiveMethodDictionary = new Dictionary<string, Delegate>();
         }
 
-        public void Invoke(string method, params object[] parameters)
+        public object Invoke(string method, params object[] parameters)
         {
             try
             {
-                archiveMethodDictionary[method].DynamicInvoke(parameters);
+                return archiveMethodDictionary[method].DynamicInvoke(parameters);
             }
             catch (KeyNotFoundException ex)
             {
@@ -127,11 +127,11 @@ namespace MethodArchiveSystem
         }
         #endregion
 
-        public async Task<bool> ArchiveAllMethod(Assembly[] assemblies)
+        public bool ArchiveAllMethod(Assembly[] assemblies)
         {
             IEnumerable<Type> types = TypeFinderExpansionMethods.GetTypeBy(assemblies).Where(type => typeof(IArchivedMethods).IsAssignableFrom(type));
 
-            return await AsyncArchiveMethodsBy(types);
+            return ArchiveMethodsBy(types);
         }
         #region Async
         public async Task<bool> AsyncArchiveAllMethod(Assembly[] assemblies)
@@ -141,5 +141,18 @@ namespace MethodArchiveSystem
             return await AsyncArchiveMethodsBy(types);
         }
         #endregion
+
+        public IEnumerable<string> GetMethodNames()
+            => archiveMethodDictionary.Keys;
+
+        public Delegate GetMethod(string name)
+        {
+            if (archiveMethodDictionary.TryGetValue(name, out Delegate @delegate))
+                return @delegate;
+            return null;
+        }
+
+        public IEnumerable<Delegate> GetMethods()
+            => archiveMethodDictionary.Values;
     }
 }

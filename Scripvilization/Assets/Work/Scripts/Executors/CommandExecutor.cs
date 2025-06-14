@@ -1,6 +1,4 @@
-﻿using AgamaLibrary.Unity.EventSystem;
-using Assets.Work.Scripts.Core.Events;
-using Assets.Work.Scripts.Core.Finders;
+﻿using Assets.Work.Scripts.Core.Finders;
 using Assets.Work.Scripts.Core.Managers;
 using Assets.Work.Scripts.Sriptable;
 using MethodArchiveSystem;
@@ -15,12 +13,14 @@ namespace Assets.Work.Scripts.Executors
     // 명령어의 메인 컨트롤러
     public class CommandExecutor : MonoBehaviour // 유효성 검사, 명령의 대상 받기, 명령어 실행, 최소한의 파싱
     {
-        [Header("Default Setting")]
-        [SerializeField] private ObjectFinder objectManagerFinder;
-        [SerializeField] protected EventChannelSO commandExecuteChannel;
+        public class ReturnValue
+        {
+            public bool isVoid;
+            public object value;
+        }
 
-        [Header("Command Setting")]
-        [SerializeField] protected string objectCallMeKeyword;
+        [Header("Default Setting")]
+        [SerializeField] private ObjectFinderSO objectManagerFinder;
 
         public Action<string> OnErrorEvent;
 
@@ -31,76 +31,90 @@ namespace Assets.Work.Scripts.Executors
         {
             _methodArchive = new MethodArchive();
             _methodArchive.ArchiveAllMethod();
+
             _objetManager = objectManagerFinder.GetObject<ObjectManager>();
 
-            commandExecuteChannel.AddListener<ExecuteCommandEvent>(HandleExecuteCommand);
+            // 오브젝트 이름이 명령어랑 같아질 수 없게
+            foreach (string method in _methodArchive.GetMethodNames())
+                _objetManager.commandKeywords.Add(method);
         }
 
-        private void OnDestroy()
+        private void Start()
         {
-            commandExecuteChannel.RemoveListener<ExecuteCommandEvent>(HandleExecuteCommand);
+            _objetManager = objectManagerFinder.GetObject<ObjectManager>();
         }
 
-        private void HandleExecuteCommand(ExecuteCommandEvent evt)
+        public ReturnValue ExecuteCommand(string script, IScriptable scriptable)
         {
-            if (string.IsNullOrEmpty(evt.command) || evt.scriptable == null)
-                return;
+            if (string.IsNullOrEmpty(script) || scriptable == null)
+                return null;
 
-            string[] commands = evt.command.Split(' ');
+            string[] commands = script.Split(' ');
 
             List<string> parameters = commands.ToList();
 
             string command = parameters[0];
             parameters.RemoveAt(0);
 
-            if (EqualityComparer<string>.Default.Equals(parameters[0], objectCallMeKeyword))
-                parameters[0] = evt.scriptable.ObjectName;
+            for (int i = 0; i < parameters.Count; ++i)
+                if (EqualityComparer<string>.Default.Equals(parameters[i], _objetManager.objectCallMeKeyword))
+                    parameters[i] = scriptable.ObjectName;
 
-            TryInvoke(command, parameters.ToArray());
+            // 참조로 인한 변경 방지
+            ReturnValue returnValue = InvokeCommand(command, parameters.ToArray());
+            return returnValue;
         }
 
-        public bool TryInvoke(string command, params string[] parameters)
+        public ReturnValue InvokeCommand(string command, params string[] parameters)
         {
             if (parameters == null)
-                return false;
+                return null;
 
+            // 인자가 없을 때
             if (parameters.Length <= 0)
-                TryInvoke("Commander", command);
+                return Invoke("Commander", command);
 
+            // 실행 대상이 없을 때
             if (!_objetManager.TryGetObject(parameters[0], out IScriptable scriptable))
-                return false;
+                // 커맨더 실행자들은 if같은 제어문일 가능성이 높음. 즉 if(명령어)같은 꼴로 명령어에 명령어가 들어가는 상황이 일어남.
+                // 이와 같은 이유로 오브젝트 플레이어가 아닌 경우는 string[]자체를 넘겨 처리하도록함.
+                return Invoke("Commander", command, new object[] { parameters });
 
-            if (parameters.Length <= 1)
-                TryInvoke(scriptable.ObjectName, command, scriptable);
+            // 실행 대상이 포함 된 인수에서 실행 대상에 해당하는 0번째를 제거
+            List<object> param = parameters.ToList().Select(v => (object)v).ToList();
+            param.RemoveAt(0);
+            param.Insert(0, scriptable);
+
+            // 만약, 실행 대상을 제외한 인수가 없을 때
+            if (parameters.Length <= 0)
+                return Invoke(scriptable.ObjectName, command, scriptable);
             else
             {
-                List<object> param = parameters.ToList().Select(v => (object)v).ToList();
-                param.RemoveAt(0);
-                param.Insert(0, scriptable);
-
-                TryInvoke(scriptable.ObjectName, command, param.ToArray());
+                // 배열로 넘기는 방식이 아닌, 하나하나 넘기는 방식은 없는 듯
+                // 굳이 꼭 해야하면 동덕으로 델리케이트 만들어서 parameter수 만큼 동적으로 만드는 방식밖에 못 하는 듯
+                return Invoke(scriptable.ObjectName, command, param.ToArray());
             }
-            // 배열로 넘기는 방식이 아닌, 하나하나 넘기는 방식은 없는 듯
-            // 굳이 꼭 해야하면 동덕으로 델리케이트 만들어서 parameter수 만큼 동적으로 만드는 방식밖에 못 하는 듯
-
-            return true;
         }
 
-        public bool TryInvoke(string errorOwner, string command, params object[] parameters)
+        public ReturnValue Invoke(string errorOwner, string command, params object[] parameters)
         {
             try
             {
+                ReturnValue returnValue = new ReturnValue();
+
                 if (parameters == null || parameters.Length <= 0)
-                    _methodArchive.Invoke(command);
+                    returnValue.value = _methodArchive.Invoke(command);
                 else
-                    _methodArchive.Invoke(command, parameters);
-                return true;
+                    returnValue.value = _methodArchive.Invoke(command, parameters);
+
+                returnValue.isVoid = _methodArchive.GetMethod(command).Method.ReturnType == typeof(void);
+                return returnValue;
             }
             catch (MethodArchiveException ex)
             {
                 OnErrorEvent?.Invoke(errorOwner);
                 Debug.LogError($"{errorOwner} : {ex.message}\n{ex.exception.Message}");
-                return false;
+                return null;
             }
         }
 
@@ -117,7 +131,7 @@ namespace Assets.Work.Scripts.Executors
 
             string[] paremeters = paremeter.Split(' ');
 
-            TryInvoke(command, paremeters);
+            InvokeCommand(command, paremeters);
         }
 #endif
     }

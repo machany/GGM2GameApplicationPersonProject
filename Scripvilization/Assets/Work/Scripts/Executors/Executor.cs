@@ -1,9 +1,9 @@
-﻿using AgamaLibrary.Unity.EventSystem;
-using Assets.Work.Scripts.Core.Events;
+﻿using Assets.Work.Scripts.Core.Finders;
 using Assets.Work.Scripts.Sriptable;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using static Assets.Work.Scripts.Executors.CommandExecutor;
 
 namespace Assets.Work.Scripts.Executors
 {
@@ -11,7 +11,7 @@ namespace Assets.Work.Scripts.Executors
     public abstract class Executor : MonoBehaviour, IExecutor
     {
         [Header("Command Setting")]
-        [SerializeField] protected EventChannelSO commandExecuteChannel;
+        [SerializeField] protected ObjectFinderSO commandExecutorFinder;
         [SerializeField] protected int commandExecuteInterval = 1000; // 명령어 작동 간격
         [SerializeField] protected string[] _commands; // 명령어 목록
         public string[] Commands
@@ -47,8 +47,11 @@ namespace Assets.Work.Scripts.Executors
 
         protected IScriptable _scriptableOwner = null;
 
+        protected CommandExecutor _commandExecutor;
+
         public event Action<int> OnCommandExecuted;
         public event Action OnCommandEndOrAbort;
+        public event Action<int> OnCommandError;
 
         protected virtual void Awake()
         {
@@ -56,10 +59,20 @@ namespace Assets.Work.Scripts.Executors
             _abort = false;
         }
 
+        protected virtual void Start()
+        {
+            _commandExecutor = commandExecutorFinder.GetObject<CommandExecutor>();
+        }
+
         protected virtual void Update()
         {
             if (Repeat && !_executing)
                 ExecuteCommands();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Abort();
         }
 
         public async void ExecuteCommands()
@@ -70,7 +83,7 @@ namespace Assets.Work.Scripts.Executors
             _abort = false;
             _executing = true;
 
-            for (int i = 0; i < Commands.Length; i++)
+            for (int pc = 0; pc < Commands.Length; pc++)
             {
                 // 명령 실행 전 중지
                 if (_abort)
@@ -81,8 +94,15 @@ namespace Assets.Work.Scripts.Executors
                     break;
                 }
 
-                commandExecuteChannel.InvokeEvent(CommandExecueteManageEvents.ExecuteCommandEvent.Initialize(Commands[i], _scriptableOwner));
-                OnCommandExecuted?.Invoke(i);
+                ReturnValue returnValue = _commandExecutor.ExecuteCommand(Commands[pc], _scriptableOwner);
+
+                if (returnValue is null || (!returnValue.isVoid && returnValue.value is null))
+                    OnCommandError?.Invoke(pc);
+                else
+                    OnCommandExecuted?.Invoke(pc);
+
+                if (returnValue is not null && returnValue.value is ProgramCounterMoveInformation pcMoveInfo)
+                    pc = Mathf.Clamp(pc + pcMoveInfo.moveProgramCounterValue, -1, Commands.Length);
 
                 await Task.Delay(commandExecuteInterval);
             }

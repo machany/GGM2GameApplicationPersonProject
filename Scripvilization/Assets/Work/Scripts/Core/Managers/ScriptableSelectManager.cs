@@ -4,7 +4,6 @@ using Assets.Work.Scripts.Core.Inputs;
 using Assets.Work.Scripts.Executors;
 using Assets.Work.Scripts.Sriptable;
 using Assets.Work.Scripts.UI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -29,7 +28,19 @@ namespace Assets.Work.Scripts.Core.Managers
         [SerializeField] private ScriptInfoUI scriptInfoUI;
 
         private IExecutor _executor;
+        private IExecutor Executor
+        {
+            get => _executor;
+            set => _executor = value ?? defaultExecutor;
+        }
+
+        private IScriptable _defaultScriptable;
         private IScriptable _scriptable;
+        private IScriptable Scriptable
+        {
+            get => _scriptable;
+            set => _scriptable = value ?? _defaultScriptable;
+        }
         private List<string> _scripts;
 
         private void Awake()
@@ -43,10 +54,11 @@ namespace Assets.Work.Scripts.Core.Managers
 
             scriptInfoUI.OnScriptableNameChange += HandleScriptableNameChange;
 
-            _scripts = new List<string>();
-        }
+            _defaultScriptable = defaultExecutor.GetComponent<IScriptable>();
 
-        
+            _scripts = new List<string>();
+            _executor = defaultExecutor;
+        }
 
         private void OnDestroy()
         {
@@ -59,42 +71,41 @@ namespace Assets.Work.Scripts.Core.Managers
 
             scriptInfoUI.OnScriptableNameChange -= HandleScriptableNameChange;
 
-            if (_executor != null)
+            if (Executor != null)
             {
-                _executor.OnCommandExecuted -= HandleCommandExecuted;
-                _executor.OnCommandEndOrAbort -= HandleCommandEndOrAbort;
+                Executor.OnCommandExecuted -= HandleCommandExecuted;
+                Executor.OnCommandEndOrAbort -= HandleCommandEndOrAbort;
+                Executor.OnCommandError -= HandleCommandError;
             }
         }
 
         private void HandleScriptableNameChange(string name)
         {
-            if (_scriptable == null)
+            if (Scriptable == null)
                 return;
 
-            if (EqualityComparer<IExecutor>.Default.Equals(_executor, defaultExecutor))
+            if (EqualityComparer<IExecutor>.Default.Equals(Executor, defaultExecutor))
                 return;
 
-            _scriptable.ObjectName = name;
-            scriptInfoUI.SetScriptableObjectName(_scriptable.ObjectName);
+            Scriptable.ObjectName = name;
+            scriptInfoUI.SetScriptableObjectName(Scriptable.ObjectName);
         }
 
         private void HandleAbortButtonClick()
         {
-            _executor?.Abort();
+            Executor.Abort();
         }
 
         private void HandleExecuteButtonClick()
         {
-            _executor?.ExecuteCommands();
+            Executor.ExecuteCommands();
+            scriptInputManager.SetText(Executor.Commands);
         }
 
         private void HandleStatusChangeButtonClick()
         {
-            if (_executor != null)
-            {
-                _executor.Repeat = !_executor.Repeat;
-                scriptInfoUI.ChangeStatusText(false, _executor.Repeat);
-            }
+            Executor.Repeat = !Executor.Repeat;
+            scriptInfoUI.ChangeStatusText(false, Executor.Repeat);
         }
 
         private void HandleMouseClickEvent(bool status)
@@ -105,64 +116,71 @@ namespace Assets.Work.Scripts.Core.Managers
             if (!GetWorldHitInfo(out RaycastHit hitInfo))
             {
                 scriptInputManager.Close();
-                _scriptable?.UnSelected();
-                _executor = defaultExecutor;
+                Scriptable?.UnSelected();
+                Executor = defaultExecutor;
                 scriptInfoUI.SetScriptableObjectName(defaultExecutorName);
+                scriptInputManager.SetText(Executor.Commands);
                 return;
             }
 
             // 기존에 선택된 오브젝트 선택취소 후 새 오브젝트 선택
-            _scriptable?.UnSelected();
-            _scriptable = hitInfo.collider.GetComponent<IScriptable>();
+            Scriptable?.UnSelected();
+            Scriptable = hitInfo.collider.GetComponent<IScriptable>();
 
-            if (_scriptable != null)
+            if (Scriptable != null)
             {
-                _scriptable?.Selected();
-                scriptInfoUI.SetScriptableObjectName(_scriptable.ObjectName);
+                Scriptable?.Selected();
+                scriptInfoUI.SetScriptableObjectName(Scriptable.ObjectName);
                 stageEventChannel.InvokeEvent(StageEvents.SelectScriptable.Init(hitInfo.collider.transform.position));
             }
 
-            if (_executor != null)
-            {
-                _executor.OnCommandExecuted -= HandleCommandExecuted;
-                _executor.OnCommandEndOrAbort -= HandleCommandEndOrAbort;
-            }
+            Executor.OnCommandExecuted -= HandleCommandExecuted;
+            Executor.OnCommandEndOrAbort -= HandleCommandEndOrAbort;
+            Executor.OnCommandError -= HandleCommandError;
 
-            _executor = hitInfo.collider.GetComponent<IExecutor>();
-            scriptInputManager.SetText(_executor.Commands);
+            Executor = hitInfo.collider.GetComponent<IExecutor>();
+            scriptInputManager.SetText(Executor.Commands);
 
-            if (_executor != null)
-            {
-                _executor.OnCommandExecuted += HandleCommandExecuted;
-                _executor.OnCommandEndOrAbort += HandleCommandEndOrAbort;
-                scriptInputManager.Open();
-            }
+            Executor.OnCommandExecuted += HandleCommandExecuted;
+            Executor.OnCommandEndOrAbort += HandleCommandEndOrAbort;
+            Executor.OnCommandError += HandleCommandError;
+            scriptInputManager.Open();
         }
 
         private void HandleCommandExecuted(int index)
         {
-            if (_executor == null || index >= _executor.Commands.Length || index < 0)
+            SetLineColor(index, "green");
+        }
+
+        private void HandleCommandError(int index)
+        {
+            SetLineColor(index, "red");
+        }
+
+        private void SetLineColor(int index, string color)
+        {
+            if (Executor == null || index >= Executor.Commands.Length || index < 0)
                 return;
 
-            string[] lines = _executor.Commands.ToArray();
+            string[] lines = Executor.Commands.ToArray();
 
             for (int i = 0; i < lines.Length; ++i)
                 lines[i] = Regex.Replace(lines[i], "<.*?>", "");
 
-            lines[index] = $"<color=red>{lines[index]}</color>";
+            lines[index] = $"<color={color}>{lines[index]}</color>";
 
             scriptInputManager.SetText(lines);
-            scriptInfoUI.ChangeStatusText(true, _executor.Repeat);
+            scriptInfoUI.ChangeStatusText(true, Executor.Repeat);
         }
 
         private void HandleCommandEndOrAbort()
         {
-            scriptInfoUI.ChangeStatusText(false, _executor.Repeat);
+            scriptInfoUI.ChangeStatusText(false, Executor.Repeat);
 
-            if (_executor == null)
+            if (Executor == null)
                 return;
 
-            string[] lines = _executor.Commands.ToArray();
+            string[] lines = Executor.Commands.ToArray();
 
             for (int i = 0; i < lines.Length; ++i)
                 lines[i] = Regex.Replace(lines[i], "<.*?>", "");
@@ -172,7 +190,7 @@ namespace Assets.Work.Scripts.Core.Managers
 
         private void HandleSaveCommand(string[] scripts)
         {
-            if (_executor == null)
+            if (Executor == null)
                 return;
 
             _scripts.Clear();
@@ -181,7 +199,7 @@ namespace Assets.Work.Scripts.Core.Managers
                 if (!string.IsNullOrEmpty(scripts[i]))
                     _scripts.Add(scripts[i].Trim());
 
-            _executor.Commands = _scripts.ToArray();
+            Executor.Commands = _scripts.ToArray();
         }
 
         public bool GetWorldHitInfo(out RaycastHit hitInfo)

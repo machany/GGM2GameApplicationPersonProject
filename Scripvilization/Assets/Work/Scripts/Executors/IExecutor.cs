@@ -12,6 +12,7 @@ namespace Assets.Work.Scripts.Executors
 
         public event Action<int> OnCommandExecuted;
         public event Action OnCommandEndOrAbort;
+        public event Action<int> OnCommandError;
 
         public void ExecuteCommands();
         public void Abort(); // 실행 중인 현재 자신이 실행 중인 명령어 중단
