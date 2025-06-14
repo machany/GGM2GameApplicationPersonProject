@@ -1,9 +1,5 @@
 ﻿using AgamaLibrary.Unity.EventSystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Assets.Work.Scripts.Core.Events
 {
@@ -14,6 +10,7 @@ namespace Assets.Work.Scripts.Core.Events
         public static ResetStageEvent ResetStageEvent = new ResetStageEvent();
         public static ArrivedGoalEvent ArrivedGoalEvent = new ArrivedGoalEvent();
         public static LeavedGoalEvent LeavedGoalEvent = new LeavedGoalEvent();
+        public static SelectScriptableEvent SelectScriptable = new SelectScriptableEvent();
     }
 
     public class StageClearEvent : GameEvent
@@ -41,5 +38,16 @@ namespace Assets.Work.Scripts.Core.Events
 
     public class LeavedGoalEvent : GameEvent
     {
+    }
+
+    public class SelectScriptableEvent : GameEvent
+    {
+        public Vector3 position;
+
+        public SelectScriptableEvent Init(Vector3 position)
+        {
+            this.position = position;
+            return this;
+        }
     }
 }

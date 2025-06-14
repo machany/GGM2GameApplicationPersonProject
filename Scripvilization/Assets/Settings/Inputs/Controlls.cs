@@ -162,6 +162,15 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleScriptUI"",
+                    ""type"": ""Button"",
+                    ""id"": ""d3d9e259-a6a7-474c-8905-ad61a5affe10"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -382,6 +391,17 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""MouseOption"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2fe5d8ba-aca9-4ff5-8dcf-cd18c2906653"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ToggleScriptUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -915,6 +935,15 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleScriptUI"",
+                    ""type"": ""Button"",
+                    ""id"": ""37c7f09c-7909-47ee-81e7-746178f4f82b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -926,6 +955,17 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""MouseClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""862daf9f-13a8-4592-b810-da4fddc3510a"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""ToggleScriptUI"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -1005,6 +1045,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         m_Player_MouseSelect = m_Player.FindAction("MouseSelect", throwIfNotFound: true);
         m_Player_MouseMove = m_Player.FindAction("MouseMove", throwIfNotFound: true);
         m_Player_MouseOption = m_Player.FindAction("MouseOption", throwIfNotFound: true);
+        m_Player_ToggleScriptUI = m_Player.FindAction("ToggleScriptUI", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1020,6 +1061,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         // Script
         m_Script = asset.FindActionMap("Script", throwIfNotFound: true);
         m_Script_MouseClick = m_Script.FindAction("MouseClick", throwIfNotFound: true);
+        m_Script_ToggleScriptUI = m_Script.FindAction("ToggleScriptUI", throwIfNotFound: true);
     }
 
     ~@Controlls()
@@ -1110,6 +1152,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_MouseSelect;
     private readonly InputAction m_Player_MouseMove;
     private readonly InputAction m_Player_MouseOption;
+    private readonly InputAction m_Player_ToggleScriptUI;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1153,6 +1196,10 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/MouseOption".
         /// </summary>
         public InputAction @MouseOption => m_Wrapper.m_Player_MouseOption;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/ToggleScriptUI".
+        /// </summary>
+        public InputAction @ToggleScriptUI => m_Wrapper.m_Player_ToggleScriptUI;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1203,6 +1250,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseOption.started += instance.OnMouseOption;
             @MouseOption.performed += instance.OnMouseOption;
             @MouseOption.canceled += instance.OnMouseOption;
+            @ToggleScriptUI.started += instance.OnToggleScriptUI;
+            @ToggleScriptUI.performed += instance.OnToggleScriptUI;
+            @ToggleScriptUI.canceled += instance.OnToggleScriptUI;
         }
 
         /// <summary>
@@ -1238,6 +1288,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseOption.started -= instance.OnMouseOption;
             @MouseOption.performed -= instance.OnMouseOption;
             @MouseOption.canceled -= instance.OnMouseOption;
+            @ToggleScriptUI.started -= instance.OnToggleScriptUI;
+            @ToggleScriptUI.performed -= instance.OnToggleScriptUI;
+            @ToggleScriptUI.canceled -= instance.OnToggleScriptUI;
         }
 
         /// <summary>
@@ -1471,6 +1524,7 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Script;
     private List<IScriptActions> m_ScriptActionsCallbackInterfaces = new List<IScriptActions>();
     private readonly InputAction m_Script_MouseClick;
+    private readonly InputAction m_Script_ToggleScriptUI;
     /// <summary>
     /// Provides access to input actions defined in input action map "Script".
     /// </summary>
@@ -1486,6 +1540,10 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Script/MouseClick".
         /// </summary>
         public InputAction @MouseClick => m_Wrapper.m_Script_MouseClick;
+        /// <summary>
+        /// Provides access to the underlying input action "Script/ToggleScriptUI".
+        /// </summary>
+        public InputAction @ToggleScriptUI => m_Wrapper.m_Script_ToggleScriptUI;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1515,6 +1573,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseClick.started += instance.OnMouseClick;
             @MouseClick.performed += instance.OnMouseClick;
             @MouseClick.canceled += instance.OnMouseClick;
+            @ToggleScriptUI.started += instance.OnToggleScriptUI;
+            @ToggleScriptUI.performed += instance.OnToggleScriptUI;
+            @ToggleScriptUI.canceled += instance.OnToggleScriptUI;
         }
 
         /// <summary>
@@ -1529,6 +1590,9 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
             @MouseClick.started -= instance.OnMouseClick;
             @MouseClick.performed -= instance.OnMouseClick;
             @MouseClick.canceled -= instance.OnMouseClick;
+            @ToggleScriptUI.started -= instance.OnToggleScriptUI;
+            @ToggleScriptUI.performed -= instance.OnToggleScriptUI;
+            @ToggleScriptUI.canceled -= instance.OnToggleScriptUI;
         }
 
         /// <summary>
@@ -1690,6 +1754,13 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseOption(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleScriptUI" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleScriptUI(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.
@@ -1783,5 +1854,12 @@ public partial class @Controlls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleScriptUI" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleScriptUI(InputAction.CallbackContext context);
     }
 }

@@ -3,6 +3,7 @@ using Assets.Work.Scripts.Core._3DGrids;
 using Assets.Work.Scripts.Core.Events;
 using Assets.Work.Scripts.Entities;
 using Assets.Work.Scripts.Sriptable;
+using EPOOutline;
 using System;
 using UnityEngine;
 
@@ -12,6 +13,11 @@ namespace Assets.Work.Scripts.Scriptables
     {
         [Header("Default Setting")]
         [SerializeField] protected EventChannelSO objectMangeEventChannel;
+        [SerializeField] protected Outlinable outLine;
+        [ColorUsage(true, true)]
+        [SerializeField] private Color selectedColor;
+        [ColorUsage(true, true)]
+        [SerializeField] private Color notSelectedColor;
 
         public GameObject Object => gameObject; // 자기자신
         [SerializeField] private string _objectName;
@@ -20,7 +26,6 @@ namespace Assets.Work.Scripts.Scriptables
             get => _objectName;
             set
             {
-                // 이름 검사 필요할 듯
                 string before = _objectName;
                 _objectName = value.Replace(" ", "");
                 objectMangeEventChannel.InvokeEvent(ObjectManageEvents.ChangeObjectEvent.Initialize(false, this, _objectName, before)); // 기존 등록 변경
@@ -39,6 +44,10 @@ namespace Assets.Work.Scripts.Scriptables
             objectMangeEventChannel.InvokeEvent(ObjectManageEvents.ChangeObjectEvent.Initialize(true, this, ObjectName));
         }
 
+        public void MoveTo(GridNode node, float moveDuration)
+        {
+            OnMove?.Invoke(node, moveDuration);
+        }
 
         public virtual void Execute()
         {
@@ -50,9 +59,14 @@ namespace Assets.Work.Scripts.Scriptables
 
         }
 
-        public void MoveTo(GridNode node, float moveDuration)
+        public void Selected()
         {
-            OnMove?.Invoke(node, moveDuration);
+            outLine.OutlineParameters.Color = selectedColor;
+        }
+
+        public void UnSelected()
+        {
+            outLine.OutlineParameters.Color = notSelectedColor;
         }
 
 #if UNITY_EDITOR

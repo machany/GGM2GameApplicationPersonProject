@@ -64,20 +64,6 @@ namespace Assets.Work.Scripts.Core.Inputs
         public event Action<bool> OnMouseOptionClickStatusEvent;
         public event Action<Vector2> OnMouseMoveEvent;
 
-        [SerializeField] private LayerMask canClickTarget;
-
-        public RaycastHit? GetWorldPosition()
-        {
-            Camera mainCam = Camera.main;
-            Debug.Assert(mainCam != null, "No main camera in this scene.");
-
-            Ray cameraRay = mainCam.ScreenPointToRay(MousePosition);
-            if (Physics.Raycast(cameraRay, out RaycastHit hit, mainCam.farClipPlane, canClickTarget))
-                return hit;
-
-            return null;
-        }
-
         public void OnMove(InputAction.CallbackContext context)
         {
             MoveDirection = context.ReadValue<Vector2>();
@@ -138,11 +124,18 @@ namespace Assets.Work.Scripts.Core.Inputs
         #region Script
 
         public event Action OnMouseClickEvent;
+        public event Action OnToggleScriptUIEvent;
 
         public void OnMouseClick(InputAction.CallbackContext context)
         {
             if (context.performed)
                 OnMouseClickEvent?.Invoke();
+        }
+
+        public void OnToggleScriptUI(InputAction.CallbackContext context)
+        {
+            if (context.performed)
+                OnToggleScriptUIEvent?.Invoke();
         }
 
         #endregion

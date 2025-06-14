@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 
@@ -8,43 +8,33 @@ namespace Assets.Work.Scripts.UI
     public class ScriptInputBlock : MonoBehaviour
     {
         [SerializeField] private TMP_InputField inputField;
-        [SerializeField] private int maxScriptLineLength;
 
-        public Action<string[]> OnDeselectEvent;
+        public event Action<string> OnSaveTextEvent;
+        public event Action OnSelectedEvent;
 
-        private int _caretPosition;
-        private string _text;
         private bool _valueChangeLock;
 
         private void Awake()
         {
+            inputField.onSelect.AddListener(HandleSelect);
             inputField.onDeselect.AddListener(HandleDeselect);
-            inputField.onValueChanged.AddListener(HandleValueChange);
             inputField.onSubmit.AddListener(ForceFocus);
 
             inputField.characterLimit = 0;
-            inputField.lineLimit = maxScriptLineLength;
             inputField.resetOnDeActivation = false;
         }
 
         private void OnDestroy()
         {
+            inputField.onSelect.RemoveListener(HandleSelect);
             inputField.onDeselect.RemoveListener(HandleDeselect);
-            inputField.onValueChanged.RemoveListener(HandleValueChange);
             inputField.onSubmit.RemoveListener(ForceFocus);
         }
 
-        private void HandleValueChange(string value)
-        {
-            _caretPosition = inputField.caretPosition;
-            _text = inputField.text;
-        }
-
         private void HandleDeselect(string value)
-            => OnDeselectEvent?.Invoke(StringToScript(value));
-
-        private string[] StringToScript(string value)
-            => value.Split('\n');
+            => OnSaveTextEvent?.Invoke(inputField.text);
+        private void HandleSelect(string value)
+            => OnSelectedEvent?.Invoke();
 
         public void SetText(string[] scripts)
         {
@@ -59,13 +49,13 @@ namespace Assets.Work.Scripts.UI
 
             _valueChangeLock = true;
 
-            Debug.Log(_caretPosition);
-            string newText = _text.Insert(Mathf.Max(_caretPosition, _text.Length - 1), "\n");
-            Debug.Log(newText);
+            OnSaveTextEvent?.Invoke(inputField.text);
+
+            string newText = inputField.text.Insert(Mathf.Min(inputField.caretPosition, inputField.text.Length), "\n");
             inputField.text = newText;
             inputField.ActivateInputField();
 
-            inputField.caretPosition = _caretPosition + 1;
+            inputField.caretPosition = inputField.caretPosition + 1;
 
             _valueChangeLock = false;
         }

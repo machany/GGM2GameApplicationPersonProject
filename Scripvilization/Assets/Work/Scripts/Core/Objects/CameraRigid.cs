@@ -1,4 +1,6 @@
-﻿using Assets.Work.Scripts.Core.Inputs;
+﻿using AgamaLibrary.Unity.EventSystem;
+using Assets.Work.Scripts.Core.Events;
+using Assets.Work.Scripts.Core.Inputs;
 using DG.Tweening;
 using Unity.Cinemachine;
 using UnityEngine;
@@ -10,6 +12,7 @@ namespace Assets.Work.Scripts.Core.Objects
         [Header("Default Setting")]
         [SerializeField] private InputSO inputSO;
         [SerializeField] private CinemachineCamera cinemachineCam;
+        [SerializeField] private EventChannelSO stageEventChannel;
         [SerializeField] private float changeToOriginDuration;
 
         [Header("Move Setting")]
@@ -39,7 +42,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
         private Vector3 _originCameraRotation;
         private float _originCameraZoom;
-        private bool _changeToOrigin;
+        private bool _moveAuto;
 
         private float _lastResetTime;
 
@@ -52,6 +55,8 @@ namespace Assets.Work.Scripts.Core.Objects
             inputSO.OnZoomDeltaValueChangeEvent += HandleZoomDeltaValueChangeEvent;
             inputSO.OnResetStatusEvent += HandleResetKeyPressedEvent;
 
+            stageEventChannel.AddListener<SelectScriptableEvent>(HandleSelectScriptableObjectEvent);
+
             _movementBoundValue = startPosition + movementBounds / 2;
             _followCamRotationValue = cinemachineCamParant.transform.eulerAngles;
 
@@ -59,7 +64,7 @@ namespace Assets.Work.Scripts.Core.Objects
             _originCameraZoom = cinemachineCam.Lens.OrthographicSize;
 
             _mouseClicked = false;
-            _changeToOrigin = false;
+            _moveAuto = false;
         }
 
         private void OnDestroy()
@@ -70,6 +75,8 @@ namespace Assets.Work.Scripts.Core.Objects
             inputSO.OnMouseMoveEvent -= HandleMouseMoveEvent;
             inputSO.OnZoomDeltaValueChangeEvent -= HandleZoomDeltaValueChangeEvent;
             inputSO.OnResetStatusEvent -= HandleResetKeyPressedEvent;
+
+            stageEventChannel.RemoveListener<SelectScriptableEvent>(HandleSelectScriptableObjectEvent);
         }
 
         private void Update()
@@ -84,7 +91,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
         private void Move(Vector2 movementValue)
         {
-            if (_changeToOrigin)
+            if (_moveAuto)
                 return;
 
             Vector3 position = transform.position;
@@ -111,7 +118,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
         private void Turn(ref float rotation, float value, float min, float max)
         {
-            if (_changeToOrigin)
+            if (_moveAuto)
                 return;
 
             float turnSpeed = this.turnSpeed * Time.deltaTime;
@@ -144,7 +151,7 @@ namespace Assets.Work.Scripts.Core.Objects
 
         private void HandleZoomDeltaValueChangeEvent(Vector2 deltaValue)
         {
-            if (_changeToOrigin)
+            if (_moveAuto)
                 return;
 
             float size = cinemachineCam.Lens.OrthographicSize;
@@ -159,22 +166,16 @@ namespace Assets.Work.Scripts.Core.Objects
             if (!status)
                 return;
 
-            bool applyMove = false;
-            if ((Time.time - _lastResetTime) < changeToOriginDuration)
-                applyMove = true;
-            else if (_changeToOrigin)
+            if (_moveAuto)
                 return;
 
-            _changeToOrigin = true;
+            _moveAuto = true;
             _lastResetTime = Time.time;
 
-            if (applyMove)
-            {
-                // move
-                Vector3 position = transform.position;
-                DOTween.To(() => position, value => position = value, new Vector3(startPosition.x, transform.position.y, startPosition.y), changeToOriginDuration)
-                    .OnUpdate(() => transform.position = position);
-            }
+            // move
+            Vector3 position = transform.position;
+            DOTween.To(() => position, value => position = value, new Vector3(startPosition.x, transform.position.y, startPosition.y), changeToOriginDuration)
+                .OnUpdate(() => transform.position = position);
 
             // rotation
             DOTween.To(() => _followCamRotationValue, value => _followCamRotationValue = value, _originCameraRotation, changeToOriginDuration)
@@ -184,7 +185,7 @@ namespace Assets.Work.Scripts.Core.Objects
             float zoomOffset = cinemachineCam.Lens.OrthographicSize;
             DOTween.To(() => zoomOffset, value => zoomOffset = value, _originCameraZoom, changeToOriginDuration)
                 .OnUpdate(() => cinemachineCam.Lens.OrthographicSize = zoomOffset)
-                .OnComplete(() => _changeToOrigin = false);
+                .OnComplete(() => _moveAuto = false);
 
             /*
             // move
@@ -207,6 +208,20 @@ namespace Assets.Work.Scripts.Core.Objects
                 });
             */
         }
+
+        private void HandleSelectScriptableObjectEvent(SelectScriptableEvent @event)
+        {
+            if (_moveAuto)
+                return;
+
+            _moveAuto = true;
+
+            Vector3 position = transform.position;
+            DOTween.To(() => position, value => position = value, new Vector3(@event.position.x, transform.position.y, @event.position.z), changeToOriginDuration)
+                .OnUpdate(() => transform.position = position)
+                .OnComplete(() => _moveAuto = false);
+        }
+
 
 #if UNITY_EDITOR
 
